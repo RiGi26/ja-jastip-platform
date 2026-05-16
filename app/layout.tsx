@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import BrandStyle from '@/components/BrandStyle'
 
 export const metadata: Metadata = {
   title: 'JapanArena Jastip — Jepang ke Indonesia',
@@ -16,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="id">
       <body className="bg-[#f3f7fc] text-[#0f172a] overflow-x-hidden">
+        <BrandStyle />
         {children}
       </body>
     </html>

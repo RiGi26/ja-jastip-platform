@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { Suspense, useState, useMemo, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Plus, Search, Download, ChevronUp, ChevronDown, Filter } from 'lucide-react'
 import { storage, STORAGE_KEYS } from '@/lib/storage'
@@ -284,7 +284,9 @@ function OrdersContent() {
 export default function OrdersPage() {
   return (
     <ToastProvider>
-      <OrdersContent />
+      <Suspense fallback={<div className="flex items-center justify-center h-64"><span className="inline-block w-6 h-6 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" /></div>}>
+        <OrdersContent />
+      </Suspense>
     </ToastProvider>
   )
 }

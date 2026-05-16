@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes floating {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes progress-slide {
+  from { width: 58%; }
+  to   { width: 84%; }
+}
+
+@keyframes pulse-dot {
+  0%   { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.animate-floating {
+  animation: floating 4s ease-in-out infinite;
+}
+
+.animate-progress {
+  animation: progress-slide 2s ease-in-out infinite alternate;
+}
+
+.animate-pulse-dot {
+  animation: pulse-dot 1.3s ease-out infinite;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}

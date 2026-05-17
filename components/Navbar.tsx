@@ -57,14 +57,26 @@ export default function Navbar() {
         </nav>
 
         {/* Desktop CTA */}
-        <a
-          href={waUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden md:inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-sm font-black text-white transition-all hover:scale-[1.02] shadow-sm"
-        >
-          💬 Tanya via WA
-        </a>
+        <div className="hidden md:flex items-center gap-2">
+          <a
+            href="/admin"
+            className={`text-xs font-semibold px-3 py-2 rounded-lg border transition-colors ${
+              isDark
+                ? 'border-white/20 text-white/60 hover:text-white hover:border-white/40'
+                : 'border-gray-200 text-gray-400 hover:text-gray-600 hover:border-gray-300'
+            }`}
+          >
+            Admin
+          </a>
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-green-600 hover:bg-green-500 text-sm font-black text-white transition-all hover:scale-[1.02] shadow-sm"
+          >
+            💬 Tanya via WA
+          </a>
+        </div>
 
         {/* Mobile hamburger */}
         <button
@@ -102,6 +114,13 @@ export default function Navbar() {
             className="block text-center px-4 py-3 rounded-xl bg-green-600 text-white text-sm font-black mt-2"
           >
             💬 Tanya via WA
+          </a>
+          <a
+            href="/admin"
+            onClick={() => setOpen(false)}
+            className="block text-center px-4 py-2.5 rounded-xl border border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 transition-colors mt-1"
+          >
+            Admin Portal
           </a>
         </div>
       </div>

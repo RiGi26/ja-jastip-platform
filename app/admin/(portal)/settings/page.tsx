@@ -9,6 +9,7 @@ import { storage, STORAGE_KEYS } from '@/lib/storage'
 import type { RateSettings } from '@/lib/types'
 import ConfirmDialog from '@/components/admin/shared/ConfirmDialog'
 import { ToastProvider, useToast } from '@/components/admin/shared/Toast'
+import { useAuth } from '@/contexts/AuthContext'
 
 const COUNTRIES = ['Jepang', 'Korea', 'Amerika Serikat', 'Eropa', 'China', 'Australia']
 const CURRENCIES = ['JPY', 'KRW', 'USD', 'EUR', 'CNY', 'AUD']
@@ -29,6 +30,7 @@ function getDefaultRates(): RateSettings {
 function SettingsContent() {
   const { settings, saveSettings, resetSettings } = useSettings()
   const { toast } = useToast()
+  const { isOwner } = useAuth()
 
   const [form, setForm] = useState<BusinessSettings>({ ...settings })
   const [rateForm, setRateForm] = useState<RateSettings>(
@@ -36,6 +38,18 @@ function SettingsContent() {
   )
   const [confirmReset, setConfirmReset] = useState(false)
   const [activeTab, setActiveTab] = useState<'identity' | 'rates'>('identity')
+
+  if (!isOwner) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <p className="text-5xl mb-4">🔒</p>
+        <p className="font-black text-gray-700 text-lg">Akses Terbatas</p>
+        <p className="text-gray-400 text-sm mt-1">
+          Halaman ini hanya bisa diakses oleh pemilik usaha.
+        </p>
+      </div>
+    )
+  }
 
   function setField<K extends keyof BusinessSettings>(key: K, value: BusinessSettings[K]) {
     setForm(prev => ({ ...prev, [key]: value }))

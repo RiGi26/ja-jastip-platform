@@ -1,3 +1,5 @@
+import BackToCorpBanner from './BackToCorpBanner'
+
 const WA_NUMBER   = process.env.NEXT_PUBLIC_WA_NUMBER   ?? '6281296917963'
 const LANDING_URL = process.env.NEXT_PUBLIC_LANDING_URL ?? 'https://ja-landingpage-platform.vercel.app'
 
@@ -5,7 +7,9 @@ const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo JapanA
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-white/40 py-12 px-4">
+    <>
+      <BackToCorpBanner />
+      <footer className="bg-slate-900 text-white/40 py-12 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
 
@@ -60,5 +64,6 @@ export default function Footer() {
         </div>
       </div>
     </footer>
+    </>
   )
 }

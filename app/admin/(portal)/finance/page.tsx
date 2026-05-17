@@ -11,6 +11,7 @@ import type { Transaction, TransactionType } from '@/lib/types'
 import StatsCard from '@/components/admin/shared/StatsCard'
 import Modal from '@/components/admin/shared/Modal'
 import { ToastProvider, useToast } from '@/components/admin/shared/Toast'
+import { useAuth } from '@/contexts/AuthContext'
 
 function getTransactions(): Transaction[] {
   return storage.get<Transaction[]>(STORAGE_KEYS.TRANSACTIONS) ?? MOCK_TRANSACTIONS
@@ -24,6 +25,7 @@ const now = new Date()
 
 function FinanceContent() {
   const { toast } = useToast()
+  const { isOwner } = useAuth()
   const [transactions, setTransactions] = useState<Transaction[]>(getTransactions)
   const [search, setSearch] = useState('')
   const [filterMonth, setFilterMonth] = useState(now.getMonth())
@@ -36,6 +38,18 @@ function FinanceContent() {
   const [fAmount, setFAmount] = useState('')
   const [fDesc, setFDesc] = useState('')
   const [fErrors, setFErrors] = useState<Record<string, string>>({})
+
+  if (!isOwner) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <p className="text-5xl mb-4">🔒</p>
+        <p className="font-black text-gray-700 text-lg">Akses Terbatas</p>
+        <p className="text-gray-400 text-sm mt-1">
+          Halaman ini hanya bisa diakses oleh pemilik usaha.
+        </p>
+      </div>
+    )
+  }
 
   const filtered = useMemo(() => {
     return transactions.filter(t => {

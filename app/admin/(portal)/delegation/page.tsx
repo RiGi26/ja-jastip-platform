@@ -31,7 +31,7 @@ function PermissionToggle({ keyName, checked, onChange }: { keyName: PermissionK
 
 function DelegationContent() {
   const { toast } = useToast()
-  const { session } = useAuth()
+  const { session, isOwner, refreshSession } = useAuth()
   const [users, setUsers] = useState<AdminUser[]>(() => getUsers().filter(u => u.role !== 'owner'))
   const [showAdd, setShowAdd] = useState(false)
   const [editUser, setEditUser] = useState<AdminUser | null>(null)
@@ -50,6 +50,18 @@ function DelegationContent() {
 
   // Edit perms
   const [editPerms, setEditPerms] = useState<PermissionKey[]>([])
+
+  if (!isOwner) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64 text-center">
+        <p className="text-5xl mb-4">🔒</p>
+        <p className="font-black text-gray-700 text-lg">Akses Terbatas</p>
+        <p className="text-gray-400 text-sm mt-1">
+          Halaman ini hanya bisa diakses oleh pemilik usaha.
+        </p>
+      </div>
+    )
+  }
 
   const allUsers = getUsers()
 
@@ -116,10 +128,13 @@ function DelegationContent() {
     const updated = allUsers.map(u => u.id === editUser.id ? { ...u, permissions: editPerms } : u)
     saveUsers(updated)
     setUsers(updated.filter(u => u.role !== 'owner'))
-    if (session?.userId === editUser.id) refreshSessionPermissions(editUser.id)
+    if (session?.userId === editUser.id) {
+      refreshSessionPermissions(editUser.id)
+      refreshSession()
+    }
     setEditUser(null)
     toast('Izin akses berhasil diperbarui')
-  }, [editUser, editPerms, allUsers, session, toast])
+  }, [editUser, editPerms, allUsers, session, refreshSession, toast])
 
   function openEdit(user: AdminUser) {
     setEditUser(user)

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MessageCircle } from 'lucide-react'
+import { MessageCircle, ShieldCheck, Download, ExternalLink, Info } from 'lucide-react'
 import { RATES } from '@/constants/rates'
 import { calculate, formatRupiah, type CalcInput } from '@/lib/calculator'
 
@@ -18,7 +18,7 @@ function InputField({
 }) {
   return (
     <div>
-      <label className="block text-[11px] font-black text-gray-400 mb-1.5 uppercase tracking-widest">
+      <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest sf-display">
         {label}
       </label>
       <input
@@ -30,7 +30,7 @@ function InputField({
           const v = step < 1 ? parseFloat(e.target.value) : parseInt(e.target.value)
           onChange(isNaN(v) ? min : Math.max(min, v))
         }}
-        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
+        className="w-full px-4 py-3 rounded-2xl border border-black/5 text-[15px] font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-apple-blue/20 focus:bg-white bg-white transition-all"
       />
     </div>
   )
@@ -46,7 +46,7 @@ function SelectField<T extends string | number>({
 }) {
   return (
     <div>
-      <label className="block text-[11px] font-black text-gray-400 mb-1.5 uppercase tracking-widest">
+      <label className="block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-widest sf-display">
         {label}
       </label>
       <select
@@ -55,7 +55,7 @@ function SelectField<T extends string | number>({
           const raw = e.target.value
           onChange((typeof value === 'number' ? Number(raw) : raw) as T)
         }}
-        className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white transition-all"
+        className="w-full px-4 py-3 rounded-2xl border border-black/5 text-[15px] font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-apple-blue/20 focus:bg-white bg-white transition-all appearance-none cursor-pointer"
       >
         {options.map(o => (
           <option key={String(o.value)} value={String(o.value)}>
@@ -94,34 +94,42 @@ export default function SmartCalculator() {
 
   const result = calculate(input)
 
-  const orderMsg = `Halo JapanArena Jastip! 🇯🇵\n\nSaya ingin order jastip dengan estimasi:\n- Total: ${formatRupiah(result.total)}\n- Berat: ${weight}kg\n- Kategori: ${category.label}\n- Pengiriman: ${service.label}\n\nMohon info lebih lanjut ya!`
+  const orderMsg = `Halo Japan Arena Corp! 🇯🇵\n\nSaya ingin order jastip dengan estimasi:\n\n📦 *DETAIL BARANG*\n- Kategori: ${category.label}\n- Berat: ${weight}kg\n- Dimensi: ${length}x${width}x${height} cm\n- Pengiriman: ${service.label}\n\n💰 *ESTIMASI TOTAL*\n*${formatRupiah(result.total)}*\n\n_(Sudah termasuk Pajak & Bea Cukai)_\n\nMohon info slot pengiriman terdekat ya!`
   const orderUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(orderMsg)}`
 
   return (
-    <section id="calculator" className="bg-white py-20 lg:py-28 px-4">
-      <div className="max-w-6xl mx-auto">
+    <section id="calculator" className="bg-[#F5F5F7] py-24 lg:py-32 px-4 relative overflow-hidden">
+      {/* Decor */}
+      <div className="absolute -left-32 top-0 w-[500px] h-[500px] bg-blue-100/30 rounded-full blur-[100px] pointer-events-none" />
+      
+      <div className="max-w-6xl mx-auto relative z-10">
 
         {/* Header */}
-        <div className="text-center mb-12">
-          <p className="text-xs font-black uppercase tracking-widest text-blue-600 mb-3">Smart Calculator</p>
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4">
-            Hitung Biaya Jastip Sekarang
+        <div className="text-center mb-16 animate-fade-up">
+          <p className="text-[12px] font-bold uppercase tracking-[0.2em] text-[#0071E3] mb-4">Precision Tool</p>
+          <h2 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4 sf-display-heavy">
+            Hitung Biaya Jastip Real-time
           </h2>
-          <p className="text-gray-400 text-lg max-w-xl mx-auto">
-            Masukkan detail barang dari Jepang — total biaya update otomatis realtime.
+          <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed">
+            Transparansi penuh tanpa biaya tersembunyi. Masukkan detail barang Anda untuk estimasi instan.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
-          {/* Left — Form */}
-          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-            <h3 className="font-black text-gray-900 text-base mb-5 flex items-center gap-2">
-              🇯🇵 Detail Barang dari Jepang
-            </h3>
+          {/* Left — Form (Apple Style Card) */}
+          <div className="bg-white rounded-[32px] p-8 md:p-10 apple-shadow border border-black/[0.03] animate-fade-up">
+            <div className="flex items-center gap-3 mb-8">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 text-apple-blue flex items-center justify-center">
+                    <span className="text-xl">🇯🇵</span>
+                </div>
+                <h3 className="font-bold text-gray-900 text-xl tracking-tight">
+                  Spesifikasi Barang
+                </h3>
+            </div>
 
             {/* Dimension + weight grid */}
-            <div className="grid grid-cols-2 gap-4 mb-2">
+            <div className="grid grid-cols-2 gap-5 mb-4">
               <InputField label="Berat (kg)"   value={weight} onChange={setWeight} min={0.1} step={0.1} />
               <InputField label="Panjang (cm)" value={length} onChange={setLength} min={1}   step={1}   />
               <InputField label="Lebar (cm)"   value={width}  onChange={setWidth}  min={1}   step={1}   />
@@ -129,130 +137,135 @@ export default function SmartCalculator() {
             </div>
 
             {/* Volume info */}
-            <p className="text-xs text-blue-600 font-semibold mb-5 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2">
-              📐 Volume: <strong>{volumeKg.toFixed(2)} kg</strong> &nbsp;({length}×{width}×{height} ÷ {RATES.VOLUME_DIVISOR.toLocaleString('id-ID')})
-            </p>
-
-            {/* Category */}
-            <div className="mb-4">
-              <SelectField
-                label="Kategori Barang"
-                value={categoryIdx}
-                onChange={setCatIdx}
-                options={RATES.CATEGORIES.map((c, i) => ({
-                  value: i,
-                  label: c.surcharge > 0
-                    ? `${c.label} (+${formatRupiah(c.surcharge)})`
-                    : c.label,
-                }))}
-              />
+            <div className="flex items-center gap-2 text-[12px] text-apple-blue font-bold mb-8 bg-blue-50 border border-apple-blue/10 rounded-xl px-4 py-3">
+              <Info size={14} />
+              <span>Volume Weight: {volumeKg.toFixed(2)} kg</span>
+              <span className="text-gray-400 font-normal ml-auto">Dimensi x Berat Divisor</span>
             </div>
 
-            {/* Service */}
-            <div className="mb-4">
-              <SelectField
-                label="Jenis Pengiriman"
-                value={serviceIdx}
-                onChange={setSvcIdx}
-                options={RATES.SERVICES.map((s, i) => ({
-                  value: i,
-                  label: `${s.label} (×${s.multiplier})`,
-                }))}
-              />
-            </div>
+            {/* Fields Stacking */}
+            <div className="space-y-6">
+                <SelectField
+                    label="Kategori Barang"
+                    value={categoryIdx}
+                    onChange={setCatIdx}
+                    options={RATES.CATEGORIES.map((c, i) => ({
+                    value: i,
+                    label: c.surcharge > 0
+                        ? `${c.label} (+${formatRupiah(c.surcharge)})`
+                        : c.label,
+                    }))}
+                />
 
-            {/* Branded + Fragile */}
-            <div className="grid grid-cols-2 gap-4">
-              <SelectField
-                label="Barang Branded?"
-                value={isBranded ? 1 : 0}
-                onChange={v => setIsBranded(v === 1)}
-                options={[
-                  { value: 0, label: 'Tidak' },
-                  { value: 1, label: `Ya (+${formatRupiah(RATES.BRANDED_FEE)})` },
-                ]}
-              />
-              <SelectField
-                label="Fragile / Mudah Pecah?"
-                value={isFragile ? 1 : 0}
-                onChange={v => setIsFragile(v === 1)}
-                options={[
-                  { value: 0, label: 'Tidak' },
-                  { value: 1, label: `Ya (+${formatRupiah(RATES.FRAGILE_FEE)})` },
-                ]}
-              />
+                <SelectField
+                    label="Jenis Layanan Pengiriman"
+                    value={serviceIdx}
+                    onChange={setSvcIdx}
+                    options={RATES.SERVICES.map((s, i) => ({
+                    value: i,
+                    label: `${s.label} (Est. ${s.label === 'Air Cargo' ? '7-14' : '30-45'} hari)`,
+                    }))}
+                />
+
+                <div className="grid grid-cols-2 gap-5">
+                <SelectField
+                    label="Layanan Branded"
+                    value={isBranded ? 1 : 0}
+                    onChange={v => setIsBranded(v === 1)}
+                    options={[
+                    { value: 0, label: 'Tidak' },
+                    { value: 1, label: `Ya` },
+                    ]}
+                />
+                <SelectField
+                    label="Proteksi Pecah Belah"
+                    value={isFragile ? 1 : 0}
+                    onChange={v => setIsFragile(v === 1)}
+                    options={[
+                    { value: 0, label: 'Tidak' },
+                    { value: 1, label: `Ya` },
+                    ]}
+                />
+                </div>
+            </div>
+            
+            <div className="mt-10 pt-6 border-t border-black/5">
+                <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
+                    <ShieldCheck size={14} className="text-green-500" />
+                    Harga estimasi sudah termasuk Pajak Impor & Bea Cukai Indonesia.
+                </div>
             </div>
           </div>
 
-          {/* Right — Result Card */}
-          <div
-            className="rounded-2xl p-6 text-white lg:sticky lg:top-24"
-            style={{ background: 'linear-gradient(135deg, #1D4ED8 0%, #1e3a8a 100%)' }}
-          >
-            <p className="text-[10px] font-black uppercase tracking-widest text-blue-200 mb-2">
-              Estimasi Total Jastip
-            </p>
-
-            {/* Total */}
-            <p className="text-4xl font-black text-white mb-1">
-              {formatRupiah(result.total)}
-            </p>
-            <p className="text-blue-200 text-sm mb-6">
-              Total estimasi · {service.label}
-            </p>
-
-            {/* Breakdown */}
-            <div className="bg-white/10 rounded-xl p-4 space-y-2.5 mb-6">
-              <div className="flex justify-between text-sm">
-                <span className="text-blue-200">Base Japan Cargo ({weight}kg)</span>
-                <span className="font-bold text-white">{formatRupiah(result.basePrice)}</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-blue-200">Volume Adjust. ({volumeKg.toFixed(2)}kg)</span>
-                <span className="font-bold text-white">{formatRupiah(result.volumePrice)}</span>
-              </div>
-              {result.extraPrice > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-blue-200">Kategori / Branded / Fragile</span>
-                  <span className="font-bold text-white">{formatRupiah(result.extraPrice)}</span>
+          {/* Right — Result Card (Premium Receipt Look) */}
+          <div className="lg:sticky lg:top-32 space-y-6 animate-fade-up" style={{animationDelay: '100ms'}}>
+            <div className="bg-white rounded-[32px] p-8 md:p-10 apple-shadow border border-black/[0.03] relative overflow-hidden">
+                {/* Visual Top Bar */}
+                <div className="absolute top-0 inset-x-0 h-2 bg-apple-blue" />
+                
+                <div className="text-center mb-8">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1">Total Estimasi Tagihan</p>
+                    <p className="text-5xl sf-display-heavy text-[#1D1D1F] tracking-tight tabular-nums">
+                        {formatRupiah(result.total)}
+                    </p>
                 </div>
-              )}
-              <div className="flex justify-between text-sm">
-                <span className="text-blue-200">Insurance & Handling</span>
-                <span className="font-bold text-white">{formatRupiah(result.insuranceHandling)}</span>
-              </div>
-              <div className="border-t border-white/20 pt-2.5 flex justify-between font-black">
-                <span className="text-white text-sm">TOTAL</span>
-                <span className="text-white">{formatRupiah(result.total)}</span>
-              </div>
+
+                <div className="space-y-4 mb-8">
+                    <div className="flex justify-between items-center text-sm border-b border-dashed border-gray-100 pb-3">
+                        <span className="text-gray-500 font-medium">Layanan</span>
+                        <span className="font-bold text-gray-900">{service.label}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm border-b border-dashed border-gray-100 pb-3">
+                        <span className="text-gray-500 font-medium">Berat Aktual ({weight}kg)</span>
+                        <span className="font-bold text-gray-900">{formatRupiah(result.basePrice)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm border-b border-dashed border-gray-100 pb-3">
+                        <span className="text-gray-500 font-medium">Biaya Penyesuaian Vol.</span>
+                        <span className="font-bold text-gray-900">{formatRupiah(result.volumePrice)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm border-b border-dashed border-gray-100 pb-3">
+                        <span className="text-gray-500 font-medium">Add-ons (Category/Branded)</span>
+                        <span className="font-bold text-gray-900">{formatRupiah(result.extraPrice)}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500 font-medium">Asuransi & Handling</span>
+                        <span className="font-bold text-gray-900">{formatRupiah(result.insuranceHandling)}</span>
+                    </div>
+                </div>
+
+                <div className="bg-[#F3FBF5] rounded-2xl p-4 mb-8 flex items-center gap-3 border border-[#E4F8EA]">
+                    <div className="w-8 h-8 rounded-lg bg-green-500 text-white flex items-center justify-center shadow-sm">
+                        <ShieldCheck size={18} />
+                    </div>
+                    <div>
+                        <p className="text-[11px] font-bold text-green-700 uppercase tracking-wide">All-Inclusive Price</p>
+                        <p className="text-[10px] text-green-600/70 font-medium leading-tight">Harga ini sudah termasuk biaya Bea Cukai & Pajak 100%.</p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col gap-3">
+                    <a
+                    href={orderUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 w-full py-4 bg-[#1D1D1F] hover:bg-black text-white font-bold rounded-2xl transition-all text-sm shadow-xl glow-button"
+                    >
+                    <MessageCircle size={18} />
+                    Kirim Estimasi ke WhatsApp
+                    </a>
+                    
+                    <button className="flex items-center justify-center gap-2 w-full py-3.5 bg-white border border-black/5 text-gray-500 hover:text-black font-bold rounded-2xl transition-all text-sm hover:bg-gray-50">
+                        <Download size={16} /> Simpan sebagai Gambar
+                    </button>
+                </div>
             </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              {['Japan Cargo', 'Luxury Support', 'Anime Goods', 'Live Tracking'].map(tag => (
-                <span
-                  key={tag}
-                  className="text-[10px] font-black px-2.5 py-1 bg-white/15 border border-white/10 rounded-full text-white"
-                >
-                  {tag}
-                </span>
-              ))}
+            {/* Currency Note */}
+            <div className="flex items-center justify-center gap-3 px-4 py-3 bg-white/50 backdrop-blur-sm rounded-2xl border border-black/[0.02] text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+                <span className="flex items-center gap-1"><ExternalLink size={12} /> Live JPY Rate</span>
+                <span className="text-gray-300">|</span>
+                <span>1 JPY = Rp 105.42</span>
             </div>
-
-            {/* CTA */}
-            <a
-              href={orderUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full py-4 bg-green-500 hover:bg-green-400 text-white font-black rounded-xl transition-all text-sm shadow-lg shadow-green-900/30"
-            >
-              <MessageCircle size={16} />
-              Order via WhatsApp
-            </a>
-
-            <p className="text-center text-blue-200/60 text-[10px] mt-3">
-              Harga akhir dikonfirmasi oleh tim kami via WA
-            </p>
           </div>
 
         </div>

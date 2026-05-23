@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useMemo, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Plus, Search, Download, ChevronUp, ChevronDown, Filter } from 'lucide-react'
+import { Plus, Search, Download, ChevronUp, ChevronDown, Filter, Package } from 'lucide-react'
 import { storage, STORAGE_KEYS } from '@/lib/storage'
 import { MOCK_ORDERS } from '@/lib/mock-orders'
 import { formatRupiah } from '@/lib/calculator'
@@ -31,18 +31,6 @@ function makeOrderNumber(orders: Order[]): string {
 }
 
 type SortKey = 'createdAt' | 'customerName' | 'total' | 'status'
-
-/* Shared input style */
-const inputStyle: React.CSSProperties = {
-  background: '#ffffff',
-  border: '1px solid #ddd9d3',
-  borderRadius: '10px',
-  color: '#100e0b',
-  fontSize: '0.875rem',
-  fontFamily: 'inherit',
-  outline: 'none',
-  transition: 'border-color 150ms, box-shadow 150ms',
-}
 
 function OrdersContent() {
   const { toast } = useToast()
@@ -123,152 +111,119 @@ function OrdersContent() {
   }, [orders, toast])
 
   function SortIcon({ col }: { col: SortKey }) {
-    if (sortKey !== col) return <ChevronUp size={11} style={{ color: '#c8c3bc' }} />
+    if (sortKey !== col) return <ChevronUp size={11} className="text-gray-300" />
     return sortAsc
-      ? <ChevronUp size={11} style={{ color: '#4f46e5' }} />
-      : <ChevronDown size={11} style={{ color: '#4f46e5' }} />
+      ? <ChevronUp size={11} className="text-apple-blue" />
+      : <ChevronDown size={11} className="text-apple-blue" />
   }
 
   return (
-    <div className="space-y-5 font-jakarta">
+    <div className="space-y-8 animate-fade-in">
 
-      {/* Header */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      {/* Header Section (Apple Style) */}
+      <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6">
         <div>
-          <h1 className="text-xl font-extrabold tracking-tight" style={{ color: '#100e0b' }}>
-            Pesanan Masuk
-          </h1>
-          <p className="text-sm mt-0.5" style={{ color: '#9c9690' }}>
-            {orders.length} total pesanan
+          <p className="text-[12px] text-gray-500 mb-1.5 font-bold uppercase tracking-widest flex items-center gap-2 sf-display">
+            <span className="w-2 h-2 rounded-full bg-apple-blue"></span>
+            Management Console • {orders.length} Active Orders
           </p>
+          <h1 className="text-[40px] sf-display-heavy tracking-tight text-[#1D1D1F] leading-tight">
+            Pesanan Masuk.
+          </h1>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <PermissionGuard permission="orders.export">
             <button
               onClick={() => exportOrdersCsv(filtered)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: '#ffffff', border: '1px solid #e8e4de', color: '#6b6560' }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#f7f6f3' }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#ffffff' }}
+              className="flex items-center gap-2 px-5 py-3 bg-white border border-black/5 rounded-full text-sm sf-display text-gray-600 hover:bg-gray-50 transition-all apple-shadow"
             >
-              <Download size={14} />
-              Export CSV
+              <Download size={16} /> Export CSV
             </button>
           </PermissionGuard>
           <PermissionGuard permission="orders.create">
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-bold transition-all"
-              style={{ background: '#4f46e5' }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = '#4338ca'
-                e.currentTarget.style.transform = 'translateY(-1px)'
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(79,70,229,0.35)'
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = '#4f46e5'
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
+              className="flex items-center gap-2 px-6 py-3 bg-[#1D1D1F] text-white rounded-full text-sm sf-display-heavy hover:bg-black transition-all shadow-lg glow-button"
             >
-              <Plus size={14} />
-              Tambah Pesanan
+              <Plus size={18} /> Tambah Pesanan
             </button>
           </PermissionGuard>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-52">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9c9690' }} />
+      {/* Filter Bar (Premium Styling) */}
+      <div className="flex flex-wrap gap-4 items-center animate-fade-up delay-100">
+        <div className="relative flex-1 min-w-[280px]">
+          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
             placeholder="Cari nama atau nomor pesanan..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
-            className="w-full pl-9 pr-4 py-2.5"
-            style={inputStyle}
-            onFocus={e => {
-              e.target.style.borderColor = '#4f46e5'
-              e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
-            }}
-            onBlur={e => {
-              e.target.style.borderColor = '#ddd9d3'
-              e.target.style.boxShadow = 'none'
-            }}
+            className="w-full pl-11 pr-4 py-3 bg-white border border-black/5 rounded-2xl text-[15px] focus:outline-none focus:ring-4 focus:ring-apple-blue/5 transition-all apple-shadow"
           />
         </div>
         <div className="relative">
-          <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9c9690' }} />
+          <Filter size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           <select
             value={statusFilter}
             onChange={e => { setStatusFilter(e.target.value as OrderStatus | ''); setPage(1) }}
-            className="pl-8 pr-4 py-2.5"
-            style={{ ...inputStyle, appearance: 'none', paddingRight: '32px' }}
-            onFocus={e => {
-              e.target.style.borderColor = '#4f46e5'
-              e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
-            }}
-            onBlur={e => {
-              e.target.style.borderColor = '#ddd9d3'
-              e.target.style.boxShadow = 'none'
-            }}
+            className="pl-11 pr-10 py-3 bg-white border border-black/5 rounded-2xl text-[15px] sf-display text-gray-600 focus:outline-none focus:ring-4 focus:ring-apple-blue/5 transition-all apple-shadow appearance-none cursor-pointer"
           >
             <option value="">Semua Status</option>
             {ALL_STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
           </select>
+          <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
         </div>
       </div>
 
-      {/* Table */}
-      <div
-        className="rounded-2xl overflow-hidden"
-        style={{ background: '#ffffff', border: '1px solid #e8e4de', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
-      >
+      {/* Table (Apple-Glass Card style) */}
+      <div className="bg-white rounded-[32px] apple-shadow border border-black/[0.03] overflow-hidden animate-fade-up delay-200">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-left">
             <thead>
-              <tr style={{ background: '#faf9f7', borderBottom: '1px solid #f0ede8' }}>
-                <th className="text-left px-5 py-3">
-                  <button onClick={() => handleSort('createdAt')} className="flex items-center gap-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Tanggal</span>
+              <tr className="bg-gray-50/50 border-b border-black/5">
+                <th className="px-8 py-5">
+                  <button onClick={() => handleSort('createdAt')} className="flex items-center gap-2 group">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 group-hover:text-gray-600 transition-colors">Tanggal</span>
                     <SortIcon col="createdAt" />
                   </button>
                 </th>
-                <th className="text-left px-3 py-3">
-                  <button onClick={() => handleSort('customerName')} className="flex items-center gap-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Pelanggan</span>
+                <th className="px-6 py-5">
+                  <button onClick={() => handleSort('customerName')} className="flex items-center gap-2 group">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 group-hover:text-gray-600 transition-colors">Pelanggan</span>
                     <SortIcon col="customerName" />
                   </button>
                 </th>
-                <th className="text-left px-3 py-3 hidden md:table-cell">
-                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Kategori</span>
+                <th className="px-6 py-5 hidden md:table-cell">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Kategori</span>
                 </th>
-                <th className="text-left px-3 py-3 hidden sm:table-cell">
-                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Berat</span>
+                <th className="px-6 py-5 hidden sm:table-cell">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">Berat</span>
                 </th>
-                <th className="text-right px-3 py-3">
-                  <button onClick={() => handleSort('total')} className="flex items-center gap-1 ml-auto">
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Total</span>
+                <th className="px-6 py-5 text-right">
+                  <button onClick={() => handleSort('total')} className="flex items-center gap-2 group ml-auto">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 group-hover:text-gray-600 transition-colors">Total</span>
                     <SortIcon col="total" />
                   </button>
                 </th>
-                <th className="text-center px-5 py-3">
-                  <button onClick={() => handleSort('status')} className="flex items-center gap-1 mx-auto">
-                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Status</span>
+                <th className="px-8 py-5 text-center">
+                  <button onClick={() => handleSort('status')} className="flex items-center gap-2 group mx-auto">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 group-hover:text-gray-600 transition-colors">Status</span>
                     <SortIcon col="status" />
                   </button>
                 </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-black/[0.02]">
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-16 text-center">
-                    <p className="text-4xl mb-3">📦</p>
-                    <p className="font-semibold" style={{ color: '#6b6560' }}>Tidak ada pesanan ditemukan</p>
-                    <p className="text-xs mt-1" style={{ color: '#9c9690' }}>Coba ubah filter pencarian</p>
+                  <td colSpan={6} className="py-24 text-center">
+                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Package size={32} className="text-gray-300" />
+                    </div>
+                    <p className="text-[#1D1D1F] sf-display-heavy text-lg">Tidak ada pesanan</p>
+                    <p className="text-sm text-gray-400 mt-1">Gunakan filter lain atau tambah pesanan baru.</p>
                   </td>
                 </tr>
               ) : (
@@ -276,30 +231,25 @@ function OrdersContent() {
                   <tr
                     key={o.id}
                     onClick={() => setSelectedOrder(o)}
-                    className="table-row-hover cursor-pointer transition-colors"
-                    style={{ borderBottom: '1px solid #faf9f7' }}
-                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#faf9f7' }}
-                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                    className="hover:bg-gray-50/50 cursor-pointer transition-colors group"
                   >
-                    <td className="px-5 py-3">
-                      <p className="font-mono text-xs font-semibold" style={{ color: '#6b6560' }}>
+                    <td className="px-8 py-5">
+                      <p className="font-mono text-xs font-bold text-[#1D1D1F]">
                         {o.orderNumber}
                       </p>
-                      <p className="text-xs mt-0.5" style={{ color: '#9c9690' }}>
-                        {new Date(o.createdAt).toLocaleDateString('id-ID')}
+                      <p className="text-[12px] text-gray-400 font-medium mt-0.5">
+                        {new Date(o.createdAt).toLocaleDateString('id-ID', {day: 'numeric', month: 'short'})}
                       </p>
                     </td>
-                    <td className="px-3 py-3 font-semibold" style={{ color: '#100e0b' }}>{o.customerName}</td>
-                    <td className="px-3 py-3 hidden md:table-cell text-sm" style={{ color: '#6b6560' }}>{o.category}</td>
-                    <td className="px-3 py-3 hidden sm:table-cell">
-                      <span className="font-mono text-xs" style={{ color: '#6b6560' }}>{o.weightKg}kg</span>
+                    <td className="px-6 py-5 font-bold text-[#1D1D1F] sf-display text-[15px]">{o.customerName}</td>
+                    <td className="px-6 py-5 hidden md:table-cell text-sm text-gray-500 font-medium">{o.category}</td>
+                    <td className="px-6 py-5 hidden sm:table-cell">
+                      <span className="bg-gray-100 px-2 py-1 rounded-md text-[11px] font-mono font-bold text-gray-600 uppercase">{o.weightKg}kg</span>
                     </td>
-                    <td className="px-3 py-3 text-right">
-                      <span className="font-mono font-bold text-sm" style={{ color: '#100e0b' }}>
-                        {formatRupiah(o.total)}
-                      </span>
+                    <td className="px-6 py-5 text-right font-mono font-bold text-apple-blue text-[15px]">
+                      {formatRupiah(o.total)}
                     </td>
-                    <td className="px-5 py-3 text-center">
+                    <td className="px-8 py-5 text-center">
                       <OrderStatusBadge status={o.status} />
                     </td>
                   </tr>
@@ -309,30 +259,22 @@ function OrdersContent() {
           </table>
         </div>
 
-        {/* Pagination */}
+        {/* Pagination (Apple Style) */}
         {totalPages > 1 && (
-          <div
-            className="flex items-center justify-between px-5 py-3"
-            style={{ borderTop: '1px solid #f0ede8' }}
-          >
-            <p className="text-xs" style={{ color: '#9c9690' }}>
-              Menampilkan {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} dari {filtered.length}
+          <div className="px-8 py-5 bg-gray-50/30 border-t border-black/5 flex items-center justify-between">
+            <p className="text-xs text-gray-400 font-bold uppercase tracking-widest leading-none">
+               Page {page} of {totalPages}
             </p>
             <div className="flex gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className="w-8 h-8 rounded-lg text-xs font-bold transition-all"
-                  style={p === page ? {
-                    background: '#4f46e5',
-                    color: '#ffffff',
-                  } : {
-                    background: 'transparent',
-                    color: '#6b6560',
-                  }}
-                  onMouseEnter={e => { if (p !== page) e.currentTarget.style.background = '#f7f6f3' }}
-                  onMouseLeave={e => { if (p !== page) e.currentTarget.style.background = 'transparent' }}
+                  className={`w-9 h-9 rounded-xl text-xs font-bold transition-all ${
+                    p === page 
+                      ? 'bg-apple-blue text-white shadow-lg shadow-blue-500/20' 
+                      : 'bg-white border border-black/5 text-gray-500 hover:bg-gray-50'
+                  }`}
                 >
                   {p}
                 </button>
@@ -342,19 +284,23 @@ function OrdersContent() {
         )}
       </div>
 
-      {/* Add Order Modal */}
+      {/* Add Order Modal (Apple Glass Redesigned) */}
       <Modal open={showForm} onClose={() => setShowForm(false)} title="Tambah Pesanan Manual" maxWidth="max-w-2xl">
-        <OrderForm onSubmit={addOrder} onCancel={() => setShowForm(false)} />
+        <div className="p-2">
+            <OrderForm onSubmit={addOrder} onCancel={() => setShowForm(false)} />
+        </div>
       </Modal>
 
-      {/* Order Detail SlideOver */}
+      {/* Order Detail SlideOver (Apple Glass Redesigned) */}
       <SlideOver open={!!selectedOrder} onClose={() => setSelectedOrder(null)} title="Detail Pesanan">
         {selectedOrder && (
-          <OrderDetail
-            order={selectedOrder}
-            onStatusChange={changeStatus}
-            onDelete={deleteOrder}
-          />
+          <div className="animate-fade-in">
+              <OrderDetail
+                order={selectedOrder}
+                onStatusChange={changeStatus}
+                onDelete={deleteOrder}
+              />
+          </div>
         )}
       </SlideOver>
     </div>
@@ -365,11 +311,8 @@ export default function OrdersPage() {
   return (
     <ToastProvider>
       <Suspense fallback={
-        <div className="flex items-center justify-center h-64">
-          <div
-            className="w-6 h-6 border-2 rounded-full animate-spin"
-            style={{ borderColor: 'rgba(79,70,229,0.2)', borderTopColor: '#4f46e5' }}
-          />
+        <div className="flex items-center justify-center h-screen">
+          <div className="w-10 h-10 border-4 border-apple-blue/20 border-t-apple-blue rounded-full animate-spin" />
         </div>
       }>
         <OrdersContent />

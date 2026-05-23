@@ -198,51 +198,50 @@ export default function SmartCalculator() {
           </div>
 
           {/* Right — Result Card (Premium Receipt Look) */}
-          <div className="lg:sticky lg:top-32 space-y-6 animate-fade-up" style={{animationDelay: '100ms'}}>
-            <div className="bg-white rounded-[32px] p-8 md:p-10 apple-shadow border border-black/[0.03] relative overflow-hidden">
+          <div className="lg:sticky lg:top-32 space-y-6 animate-fade-up w-full" style={{animationDelay: '100ms'}}>
+            <div className="bg-white rounded-[32px] p-6 md:p-10 apple-shadow border border-black/[0.03] relative overflow-hidden">
                 {/* Visual Top Bar */}
                 <div className="absolute top-0 inset-x-0 h-2 bg-apple-blue" />
-                
+
                 <div className="text-center mb-8">
                     <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-gray-400 mb-1">Total Estimasi Tagihan</p>
-                    <p className="text-5xl sf-display-heavy text-[#1D1D1F] tracking-tight tabular-nums">
+                    <p className="text-3xl sm:text-4xl md:text-5xl sf-display-heavy text-[#1D1D1F] tracking-tight tabular-nums break-words">
                         {formatRupiah(result.total)}
                     </p>
                 </div>
 
                 <div className="space-y-4 mb-8">
-                    <div className="flex justify-between items-center text-sm border-b border-dashed border-gray-100 pb-3">
+                    <div className="flex justify-between items-center text-xs sm:text-sm border-b border-dashed border-gray-100 pb-3">
                         <span className="text-gray-500 font-medium">Layanan</span>
                         <span className="font-bold text-gray-900">{service.label}</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-dashed border-gray-100 pb-3">
-                        <span className="text-gray-500 font-medium">Berat Aktual ({weight}kg)</span>
-                        <span className="font-bold text-gray-900">{formatRupiah(result.basePrice)}</span>
+                    <div className="flex justify-between items-center text-xs sm:text-sm border-b border-dashed border-gray-100 pb-3">
+                        <span className="text-gray-500 font-medium text-left mr-2">Berat Aktual ({weight}kg)</span>
+                        <span className="font-bold text-gray-900 text-right">{formatRupiah(result.basePrice)}</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-dashed border-gray-100 pb-3">
-                        <span className="text-gray-500 font-medium">Biaya Penyesuaian Vol.</span>
-                        <span className="font-bold text-gray-900">{formatRupiah(result.volumePrice)}</span>
+                    <div className="flex justify-between items-center text-xs sm:text-sm border-b border-dashed border-gray-100 pb-3">
+                        <span className="text-gray-500 font-medium text-left mr-2">Biaya Penyesuaian Vol.</span>
+                        <span className="font-bold text-gray-900 text-right">{formatRupiah(result.volumePrice)}</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm border-b border-dashed border-gray-100 pb-3">
-                        <span className="text-gray-500 font-medium">Add-ons (Category/Branded)</span>
-                        <span className="font-bold text-gray-900">{formatRupiah(result.extraPrice)}</span>
+                    <div className="flex justify-between items-center text-xs sm:text-sm border-b border-dashed border-gray-100 pb-3">
+                        <span className="text-gray-500 font-medium text-left mr-2">Add-ons (Cat/Brand)</span>
+                        <span className="font-bold text-gray-900 text-right">{formatRupiah(result.extraPrice)}</span>
                     </div>
-                    <div className="flex justify-between items-center text-sm">
+                    <div className="flex justify-between items-center text-xs sm:text-sm">
                         <span className="text-gray-500 font-medium">Asuransi & Handling</span>
                         <span className="font-bold text-gray-900">{formatRupiah(result.insuranceHandling)}</span>
                     </div>
                 </div>
 
                 <div className="bg-[#F3FBF5] rounded-2xl p-4 mb-8 flex items-center gap-3 border border-[#E4F8EA]">
-                    <div className="w-8 h-8 rounded-lg bg-green-500 text-white flex items-center justify-center shadow-sm">
+                    <div className="w-8 h-8 rounded-lg bg-green-500 text-white flex items-center justify-center shadow-sm shrink-0">
                         <ShieldCheck size={18} />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                         <p className="text-[11px] font-bold text-green-700 uppercase tracking-wide">All-Inclusive Price</p>
                         <p className="text-[10px] text-green-600/70 font-medium leading-tight">Harga ini sudah termasuk biaya Bea Cukai & Pajak 100%.</p>
                     </div>
                 </div>
-
                 <div className="flex flex-col gap-3">
                     <a
                     href={orderUrl}

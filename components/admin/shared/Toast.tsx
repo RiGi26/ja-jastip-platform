@@ -17,6 +17,27 @@ interface ToastContextValue {
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
+const TOAST_CONFIG = {
+  success: {
+    icon:   <CheckCircle size={16} />,
+    border: '#16a34a',
+    iconColor: '#16a34a',
+    bg:     '#f0fdf4',
+  },
+  error: {
+    icon:   <XCircle size={16} />,
+    border: '#dc2626',
+    iconColor: '#dc2626',
+    bg:     '#fef2f2',
+  },
+  info: {
+    icon:   <Info size={16} />,
+    border: '#4f46e5',
+    iconColor: '#4f46e5',
+    bg:     '#eef2ff',
+  },
+}
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
 
@@ -33,41 +54,50 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ toast }}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full">
+      <div className="fixed bottom-5 right-5 z-[100] flex flex-col gap-2 max-w-sm w-full">
         {toasts.map(t => (
-          <ToastItem key={t.id} item={t} onRemove={() => remove(t.id)} />
+          <ToastNotification key={t.id} item={t} onRemove={() => remove(t.id)} />
         ))}
       </div>
     </ToastContext.Provider>
   )
 }
 
-function ToastItem({ item, onRemove }: { item: ToastItem; onRemove: () => void }) {
+function ToastNotification({ item, onRemove }: { item: ToastItem; onRemove: () => void }) {
   useEffect(() => {
     const timer = setTimeout(onRemove, 4000)
     return () => clearTimeout(timer)
   }, [onRemove])
 
-  const icons = {
-    success: <CheckCircle size={18} className="text-green-500" />,
-    error: <XCircle size={18} className="text-red-500" />,
-    info: <Info size={18} className="text-blue-500" />,
-  }
-
-  const borders = {
-    success: 'border-green-200',
-    error: 'border-red-200',
-    info: 'border-blue-200',
-  }
+  const cfg = TOAST_CONFIG[item.type]
 
   return (
     <div
-      className={`flex items-start gap-3 bg-white rounded-xl border ${borders[item.type]} shadow-lg px-4 py-3 text-sm`}
+      className="flex items-start gap-3 rounded-xl px-4 py-3 animate-toast-in"
+      style={{
+        background: '#ffffff',
+        borderLeft: `4px solid ${cfg.border}`,
+        boxShadow: '0 8px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.05)',
+        border: '1px solid #e8e4de',
+        borderLeftWidth: '4px',
+        borderLeftColor: cfg.border,
+      }}
     >
-      {icons[item.type]}
-      <p className="flex-1 text-gray-800 font-medium">{item.message}</p>
-      <button onClick={onRemove} aria-label="Tutup notifikasi" className="text-gray-400 hover:text-gray-600 flex-shrink-0">
-        <X size={14} />
+      <span className="flex-shrink-0 mt-0.5" style={{ color: cfg.iconColor }}>
+        {cfg.icon}
+      </span>
+      <p className="flex-1 text-sm font-semibold" style={{ color: '#100e0b' }}>
+        {item.message}
+      </p>
+      <button
+        onClick={onRemove}
+        aria-label="Tutup notifikasi"
+        className="flex-shrink-0 transition-colors"
+        style={{ color: '#9c9690' }}
+        onMouseEnter={e => { e.currentTarget.style.color = '#6b6560' }}
+        onMouseLeave={e => { e.currentTarget.style.color = '#9c9690' }}
+      >
+        <X size={13} />
       </button>
     </div>
   )

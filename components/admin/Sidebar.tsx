@@ -22,15 +22,16 @@ interface NavItem {
   icon: React.ReactNode
   ownerOnly?: boolean
   permission?: string
+  group?: string
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/admin/dashboard',   label: 'Dashboard',         icon: <LayoutDashboard size={18} /> },
-  { href: '/admin/orders',      label: 'Pesanan Masuk',     icon: <Package size={18} />,     permission: 'orders.view' },
-  { href: '/admin/finance',     label: 'Keuangan',          icon: <DollarSign size={18} />,  ownerOnly: true },
-  { href: '/admin/calculator',  label: 'Kalkulator Ongkir', icon: <Calculator size={18} />,  permission: 'calculator.use' },
-  { href: '/admin/delegation',  label: 'Delegasi Admin',    icon: <Users size={18} />,       ownerOnly: true },
-  { href: '/admin/settings',    label: 'Pengaturan Usaha',  icon: <Settings size={18} />,    ownerOnly: true },
+  { href: '/admin/dashboard',   label: 'Dashboard',         icon: <LayoutDashboard size={16} />, group: 'main' },
+  { href: '/admin/orders',      label: 'Pesanan Masuk',     icon: <Package size={16} />,          group: 'main', permission: 'orders.view' },
+  { href: '/admin/calculator',  label: 'Kalkulator Ongkir', icon: <Calculator size={16} />,       group: 'main', permission: 'calculator.use' },
+  { href: '/admin/finance',     label: 'Keuangan',          icon: <DollarSign size={16} />,       group: 'ops',  ownerOnly: true },
+  { href: '/admin/delegation',  label: 'Delegasi Admin',    icon: <Users size={16} />,            group: 'ops',  ownerOnly: true },
+  { href: '/admin/settings',    label: 'Pengaturan Usaha',  icon: <Settings size={16} />,         group: 'ops',  ownerOnly: true },
 ]
 
 interface SidebarProps {
@@ -57,67 +58,198 @@ export default function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onClo
     return pathname === href || pathname.startsWith(href + '/')
   }
 
+  const visibleItems = NAV_ITEMS.filter(isVisible)
+  const mainItems = visibleItems.filter(i => i.group === 'main')
+  const opsItems  = visibleItems.filter(i => i.group === 'ops')
+
+  const initials = session?.name?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() ?? '?'
+
   const sidebarContent = (
-    <div className="flex flex-col h-full">
-      {/* Logo/Header */}
-      <div className={`flex items-center h-16 px-4 border-b border-slate-700 ${collapsed ? 'justify-center' : 'justify-between'}`}>
+    <div className="flex flex-col h-full overflow-hidden">
+
+      {/* ── Logo / wordmark ── */}
+      <div
+        className={`flex items-center h-[72px] px-4 flex-shrink-0 ${collapsed ? 'justify-center' : 'justify-between'}`}
+        style={{ borderBottom: '1px solid #141b2d' }}
+      >
         {!collapsed && (
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-xl">{settings.countryEmoji}</span>
-            <span className="text-white font-black text-sm truncate">{settings.businessName}</span>
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-base"
+              style={{ background: 'rgba(232,48,58,0.15)', border: '1px solid rgba(232,48,58,0.25)' }}
+            >
+              {settings.countryEmoji}
+            </div>
+            <div className="min-w-0">
+              <p className="text-white font-extrabold text-sm leading-tight truncate tracking-tight">
+                {settings.businessName}
+              </p>
+              <p className="text-[10px] leading-none mt-0.5" style={{ color: '#e8303a', fontWeight: 700, letterSpacing: '0.04em' }}>
+                ADMIN PORTAL
+              </p>
+            </div>
           </div>
         )}
-        {collapsed && <span className="text-xl">{settings.countryEmoji}</span>}
+
+        {collapsed && (
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-base"
+            style={{ background: 'rgba(232,48,58,0.15)', border: '1px solid rgba(232,48,58,0.25)' }}
+          >
+            {settings.countryEmoji}
+          </div>
+        )}
+
         <button
           onClick={onToggleCollapse}
           aria-label={collapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
-          className="hidden lg:flex items-center justify-center w-7 h-7 rounded-lg text-slate-400 hover:text-white hover:bg-slate-700 transition-colors flex-shrink-0"
+          className="hidden lg:flex items-center justify-center w-6 h-6 rounded-md flex-shrink-0 transition-colors"
+          style={{ color: '#7a8599' }}
+          onMouseEnter={e => {
+            e.currentTarget.style.color = '#f0f4ff'
+            e.currentTarget.style.background = 'rgba(255,255,255,0.05)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.color = '#7a8599'
+            e.currentTarget.style.background = 'transparent'
+          }}
         >
-          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          {collapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </button>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(item => {
-          const visible = isVisible(item)
+      {/* ── Navigation ── */}
+      <nav className="flex-1 py-4 px-2 overflow-y-auto sidebar-scroll space-y-0.5">
+
+        {mainItems.map(item => {
           const active = isActive(item.href)
-
-          if (!visible) return null
-
           return (
             <Link
               key={item.href}
               href={item.href}
               onClick={onCloseMobile}
               title={collapsed ? item.label : undefined}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
-                active
-                  ? 'bg-blue-600 text-white'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-700'
-              } ${collapsed ? 'justify-center' : ''}`}
+              style={active ? {
+                background: 'rgba(232, 48, 58, 0.10)',
+                color: '#f0f4ff',
+                borderLeft: '3px solid #e8303a',
+              } : {
+                borderLeft: '3px solid transparent',
+                color: '#7a8599',
+              }}
+              className={`
+                flex items-center gap-3 px-3 py-2.5 rounded-r-xl text-sm font-semibold transition-all duration-150
+                ${collapsed ? 'justify-center' : ''}
+              `}
+              onMouseEnter={e => {
+                if (!active) {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.background = 'rgba(255,255,255,0.04)'
+                  el.style.color = '#c8d0e0'
+                }
+              }}
+              onMouseLeave={e => {
+                if (!active) {
+                  const el = e.currentTarget as HTMLElement
+                  el.style.background = 'transparent'
+                  el.style.color = '#7a8599'
+                }
+              }}
             >
               <span className="flex-shrink-0">{item.icon}</span>
               {!collapsed && <span className="truncate">{item.label}</span>}
             </Link>
           )
         })}
-      </nav>
 
-      {/* Footer */}
-      <div className={`px-4 py-4 border-t border-slate-700 ${collapsed ? 'text-center' : ''}`}>
-        {!collapsed && (
+        {opsItems.length > 0 && (
           <>
-            <p className="text-white text-xs font-bold truncate">{session?.name}</p>
-            <p className="text-slate-500 text-xs mt-0.5 capitalize">{session?.role}</p>
-            <p className="text-slate-600 text-[10px] mt-2">v1.0.0</p>
+            {!collapsed && (
+              <div className="pt-4 pb-1 px-3">
+                <p className="text-[10px] font-bold uppercase tracking-widest" style={{ color: '#3d4761' }}>
+                  Operasional
+                </p>
+              </div>
+            )}
+            {collapsed && <div className="my-3 mx-2" style={{ borderTop: '1px solid #141b2d' }} />}
+
+            {opsItems.map(item => {
+              const active = isActive(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={onCloseMobile}
+                  title={collapsed ? item.label : undefined}
+                  style={active ? {
+                    background: 'rgba(232, 48, 58, 0.10)',
+                    color: '#f0f4ff',
+                    borderLeft: '3px solid #e8303a',
+                  } : {
+                    borderLeft: '3px solid transparent',
+                    color: '#7a8599',
+                  }}
+                  className={`
+                    flex items-center gap-3 px-3 py-2.5 rounded-r-xl text-sm font-semibold transition-all duration-150
+                    ${collapsed ? 'justify-center' : ''}
+                  `}
+                  onMouseEnter={e => {
+                    if (!active) {
+                      const el = e.currentTarget as HTMLElement
+                      el.style.background = 'rgba(255,255,255,0.04)'
+                      el.style.color = '#c8d0e0'
+                    }
+                  }}
+                  onMouseLeave={e => {
+                    if (!active) {
+                      const el = e.currentTarget as HTMLElement
+                      el.style.background = 'transparent'
+                      el.style.color = '#7a8599'
+                    }
+                  }}
+                >
+                  <span className="flex-shrink-0">{item.icon}</span>
+                  {!collapsed && <span className="truncate">{item.label}</span>}
+                </Link>
+              )
+            })}
           </>
         )}
-        {collapsed && (
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center mx-auto">
-            <span className="text-white text-xs font-black">
-              {session?.name?.charAt(0).toUpperCase()}
-            </span>
+      </nav>
+
+      {/* ── Footer ── */}
+      <div
+        className={`flex-shrink-0 px-3 py-4 ${collapsed ? 'items-center justify-center flex flex-col' : ''}`}
+        style={{ borderTop: '1px solid #141b2d' }}
+      >
+        {!collapsed ? (
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 font-mono text-xs font-bold"
+              style={{ background: 'rgba(232,48,58,0.15)', border: '1px solid rgba(232,48,58,0.25)', color: '#e8303a' }}
+            >
+              {initials}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-white text-xs font-bold leading-tight truncate">{session?.name}</p>
+              <p
+                className="text-[10px] mt-0.5 capitalize font-semibold px-1.5 py-0.5 rounded inline-block"
+                style={{
+                  background: session?.role === 'owner' ? 'rgba(232,48,58,0.12)' : 'rgba(79,70,229,0.12)',
+                  color: session?.role === 'owner' ? '#e8303a' : '#818cf8',
+                }}
+              >
+                {session?.role}
+              </p>
+            </div>
+            <p className="text-[9px] flex-shrink-0" style={{ color: '#3d4761' }}>v1.0</p>
+          </div>
+        ) : (
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center font-mono text-xs font-bold"
+            style={{ background: 'rgba(232,48,58,0.15)', border: '1px solid rgba(232,48,58,0.25)', color: '#e8303a' }}
+          >
+            {initials}
           </div>
         )}
       </div>
@@ -128,9 +260,12 @@ export default function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onClo
     <>
       {/* Desktop sidebar */}
       <aside
-        className={`hidden lg:flex flex-col bg-slate-900 border-r border-slate-700 transition-all duration-300 flex-shrink-0 ${
-          collapsed ? 'w-16' : 'w-60'
-        }`}
+        className={`hidden lg:flex flex-col flex-shrink-0 transition-all duration-300`}
+        style={{
+          width: collapsed ? '64px' : '240px',
+          background: '#080c14',
+          borderRight: '1px solid #141b2d',
+        }}
       >
         {sidebarContent}
       </aside>
@@ -139,16 +274,21 @@ export default function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onClo
       {mobileOpen && (
         <div className="lg:hidden fixed inset-0 z-40 flex">
           <div
-            className="fixed inset-0 bg-black/60"
+            className="fixed inset-0"
+            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
             onClick={onCloseMobile}
           />
-          <aside className="relative flex flex-col w-64 bg-slate-900 border-r border-slate-700 z-50">
+          <aside
+            className="relative flex flex-col w-60 z-50"
+            style={{ background: '#080c14', borderRight: '1px solid #141b2d' }}
+          >
             <button
               onClick={onCloseMobile}
               aria-label="Tutup menu"
-              className="absolute top-4 right-4 text-slate-400 hover:text-white"
+              className="absolute top-5 right-4 p-1 rounded-md transition-colors"
+              style={{ color: '#7a8599' }}
             >
-              <X size={20} />
+              <X size={18} />
             </button>
             {sidebarContent}
           </aside>

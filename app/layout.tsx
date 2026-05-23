@@ -1,6 +1,21 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import BrandStyle from '@/components/BrandStyle'
+import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google'
+
+const jakartaSans = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  variable: '--font-jakarta',
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'JapanArena Jastip — Jepang ke Indonesia',
@@ -15,8 +30,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="id">
-      <body className="bg-[#f3f7fc] text-[#0f172a] overflow-x-hidden">
+    <html lang="id" className={`${jakartaSans.variable} ${jetbrainsMono.variable}`}>
+      <body className="bg-[#f3f7fc] text-[#0f172a] overflow-x-hidden font-jakarta">
         <BrandStyle />
         {children}
       </body>

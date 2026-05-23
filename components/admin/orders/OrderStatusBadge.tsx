@@ -1,29 +1,30 @@
 import type { OrderStatus } from '@/lib/types'
 
-const STATUS_STYLES: Record<OrderStatus, string> = {
-  menunggu:     'bg-amber-100 text-amber-700',
-  dikonfirmasi: 'bg-blue-100 text-blue-700',
-  diproses:     'bg-violet-100 text-violet-700',
-  dikirim:      'bg-orange-100 text-orange-700',
-  selesai:      'bg-green-100 text-green-700',
-  dibatalkan:   'bg-red-100 text-red-700',
-}
-
-const STATUS_LABELS: Record<OrderStatus, string> = {
-  menunggu:     'Menunggu',
-  dikonfirmasi: 'Dikonfirmasi',
-  diproses:     'Diproses',
-  dikirim:      'Dikirim',
-  selesai:      'Selesai',
-  dibatalkan:   'Dibatalkan',
+const STATUS_CONFIG: Record<OrderStatus, { label: string; color: string; bg: string; dot: string }> = {
+  menunggu:     { label: 'Menunggu',     color: '#b45309', bg: 'rgba(217,119,6,0.10)',    dot: '#d97706' },
+  dikonfirmasi: { label: 'Dikonfirmasi', color: '#4338ca', bg: 'rgba(79,70,229,0.10)',    dot: '#4f46e5' },
+  diproses:     { label: 'Diproses',     color: '#6d28d9', bg: 'rgba(124,58,237,0.10)',   dot: '#7c3aed' },
+  dikirim:      { label: 'Dikirim',      color: '#c2410c', bg: 'rgba(234,88,12,0.10)',    dot: '#ea580c' },
+  selesai:      { label: 'Selesai',      color: '#15803d', bg: 'rgba(22,163,74,0.10)',    dot: '#16a34a' },
+  dibatalkan:   { label: 'Dibatalkan',   color: '#b91c1c', bg: 'rgba(220,38,38,0.10)',    dot: '#dc2626' },
 }
 
 export default function OrderStatusBadge({ status }: { status: OrderStatus }) {
+  const cfg = STATUS_CONFIG[status]
   return (
-    <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${STATUS_STYLES[status]}`}>
-      {STATUS_LABELS[status]}
+    <span
+      className="inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-full"
+      style={{ background: cfg.bg, color: cfg.color }}
+    >
+      <span
+        className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+        style={{ background: cfg.dot }}
+      />
+      {cfg.label}
     </span>
   )
 }
 
-export { STATUS_LABELS }
+export const STATUS_LABELS: Record<OrderStatus, string> = Object.fromEntries(
+  Object.entries(STATUS_CONFIG).map(([k, v]) => [k, v.label])
+) as Record<OrderStatus, string>

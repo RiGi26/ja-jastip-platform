@@ -23,6 +23,19 @@ function saveTransactions(t: Transaction[]): void {
 const MONTHS = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']
 const now = new Date()
 
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 14px',
+  border: '1px solid #ddd9d3',
+  borderRadius: '10px',
+  background: '#ffffff',
+  color: '#100e0b',
+  fontSize: '0.875rem',
+  fontFamily: 'inherit',
+  outline: 'none',
+  transition: 'border-color 150ms, box-shadow 150ms',
+}
+
 function FinanceContent() {
   const { toast } = useToast()
   const { isOwner } = useAuth()
@@ -32,7 +45,6 @@ function FinanceContent() {
   const [filterYear, setFilterYear] = useState(now.getFullYear())
   const [showForm, setShowForm] = useState(false)
 
-  // Form state
   const [fDate, setFDate] = useState(new Date().toISOString().split('T')[0])
   const [fType, setFType] = useState<TransactionType>('masuk')
   const [fAmount, setFAmount] = useState('')
@@ -43,8 +55,8 @@ function FinanceContent() {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
         <p className="text-5xl mb-4">🔒</p>
-        <p className="font-black text-gray-700 text-lg">Akses Terbatas</p>
-        <p className="text-gray-400 text-sm mt-1">
+        <p className="font-extrabold text-lg" style={{ color: '#100e0b' }}>Akses Terbatas</p>
+        <p className="text-sm mt-1" style={{ color: '#9c9690' }}>
           Halaman ini hanya bisa diakses oleh pemilik usaha.
         </p>
       </div>
@@ -69,7 +81,9 @@ function FinanceContent() {
   const avgOrderValue = completedOrders.length > 0
     ? Math.round(completedOrders.reduce((s, o) => s + o.total, 0) / completedOrders.length)
     : 0
-  const ytdIncome = transactions.filter(t => new Date(t.date).getFullYear() === filterYear && t.type === 'masuk').reduce((s, t) => s + t.amount, 0)
+  const ytdIncome = transactions
+    .filter(t => new Date(t.date).getFullYear() === filterYear && t.type === 'masuk')
+    .reduce((s, t) => s + t.amount, 0)
 
   function validateForm(): boolean {
     const e: Record<string, string> = {}
@@ -100,8 +114,17 @@ function FinanceContent() {
     toast('Transaksi berhasil ditambahkan')
   }, [fDate, fType, fAmount, fDesc, transactions, toast])
 
-  function handlePrint() {
-    window.print()
+  function handlePrint() { window.print() }
+
+  const focusStyle = {
+    onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      e.target.style.borderColor = '#4f46e5'
+      e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
+    },
+    onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      e.target.style.borderColor = '#ddd9d3'
+      e.target.style.boxShadow = 'none'
+    },
   }
 
   return (
@@ -114,32 +137,50 @@ function FinanceContent() {
         }
       `}</style>
 
-      <div className="space-y-5 no-print">
+      <div className="space-y-5 no-print font-jakarta">
+        {/* Header */}
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="text-xl font-black text-gray-900">Keuangan</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Ringkasan pemasukan & pengeluaran</p>
+            <h1 className="text-xl font-extrabold tracking-tight" style={{ color: '#100e0b' }}>
+              Keuangan
+            </h1>
+            <p className="text-sm mt-0.5" style={{ color: '#9c9690' }}>
+              Ringkasan pemasukan &amp; pengeluaran
+            </p>
           </div>
           <div className="flex gap-2">
-            <button
-              onClick={() => exportTransactionsCsv(filtered)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-colors"
-            >
-              <Download size={15} />
-              Export CSV
-            </button>
-            <button
-              onClick={handlePrint}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-colors"
-            >
-              <Printer size={15} />
-              Print PDF
-            </button>
+            {[
+              { label: 'Export CSV', icon: <Download size={14} />, onClick: () => exportTransactionsCsv(filtered) },
+              { label: 'Print PDF', icon: <Printer size={14} />, onClick: handlePrint },
+            ].map(btn => (
+              <button
+                key={btn.label}
+                onClick={btn.onClick}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all"
+                style={{ background: '#ffffff', border: '1px solid #e8e4de', color: '#6b6560' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#f7f6f3' }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#ffffff' }}
+              >
+                {btn.icon}
+                {btn.label}
+              </button>
+            ))}
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-bold transition-all"
+              style={{ background: '#4f46e5' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#4338ca'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(79,70,229,0.35)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#4f46e5'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             >
-              <Plus size={15} />
+              <Plus size={14} />
               Tambah Catatan
             </button>
           </div>
@@ -150,27 +191,31 @@ function FinanceContent() {
           <StatsCard
             title="Pemasukan Bulan Ini"
             value={formatRupiah(thisMonthIncome)}
-            icon={<TrendingUp size={18} className="text-green-600" />}
+            icon={<TrendingUp size={16} style={{ color: '#16a34a' }} />}
             iconBg="bg-green-100"
+            accent="green"
           />
           <StatsCard
             title="Pengeluaran Bulan Ini"
             value={formatRupiah(thisMonthOut)}
-            icon={<TrendingDown size={18} className="text-red-500" />}
+            icon={<TrendingDown size={16} style={{ color: '#dc2626' }} />}
             iconBg="bg-red-100"
+            accent="red"
           />
           <StatsCard
             title="Rata-rata Nilai Order"
             value={formatRupiah(avgOrderValue)}
-            icon={<TrendingUp size={18} className="text-blue-600" />}
-            iconBg="bg-blue-100"
+            icon={<TrendingUp size={16} style={{ color: '#4f46e5' }} />}
+            iconBg="bg-indigo-100"
+            accent="indigo"
             subtitle={`dari ${completedOrders.length} pesanan selesai`}
           />
           <StatsCard
             title="Pemasukan Kotor YTD"
             value={formatRupiah(ytdIncome)}
-            icon={<TrendingUp size={18} className="text-violet-600" />}
+            icon={<TrendingUp size={16} style={{ color: '#7c3aed' }} />}
             iconBg="bg-violet-100"
+            accent="violet"
             subtitle={`Tahun ${filterYear}`}
           />
         </div>
@@ -178,68 +223,107 @@ function FinanceContent() {
         {/* Filters */}
         <div className="flex flex-wrap gap-3">
           <div className="relative flex-1 min-w-52">
-            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9c9690' }} />
             <input
               type="text"
               placeholder="Cari nama atau nomor pesanan..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="pl-9 pr-4 py-2.5"
+              style={inputStyle}
+              {...focusStyle}
             />
           </div>
           <select
             value={filterMonth}
             onChange={e => setFilterMonth(Number(e.target.value))}
-            className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2.5"
+            style={{ ...inputStyle, width: 'auto', appearance: 'none', paddingRight: '28px' }}
+            {...focusStyle}
           >
             {MONTHS.map((m, i) => <option key={i} value={i}>{m}</option>)}
           </select>
           <select
             value={filterYear}
             onChange={e => setFilterYear(Number(e.target.value))}
-            className="px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2.5"
+            style={{ ...inputStyle, width: 'auto', appearance: 'none', paddingRight: '28px' }}
+            {...focusStyle}
           >
             {[2024, 2025, 2026].map(y => <option key={y} value={y}>{y}</option>)}
           </select>
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div
+          className="rounded-2xl overflow-hidden"
+          style={{ background: '#ffffff', border: '1px solid #e8e4de', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+        >
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-100">
-                <tr>
-                  <th className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider px-5 py-3">Tanggal</th>
-                  <th className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-3 hidden md:table-cell">No. Pesanan</th>
-                  <th className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-3">Keterangan</th>
-                  <th className="text-right text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-3">Nominal</th>
-                  <th className="text-center text-xs font-bold text-gray-400 uppercase tracking-wider px-5 py-3">Tipe</th>
+              <thead>
+                <tr style={{ background: '#faf9f7', borderBottom: '1px solid #f0ede8' }}>
+                  {['Tanggal', 'No. Pesanan', 'Keterangan', 'Nominal', 'Tipe'].map((h, i) => (
+                    <th
+                      key={h}
+                      className={`py-3 ${i === 0 ? 'text-left px-5' : i === 1 ? 'text-left px-3 hidden md:table-cell' : i === 3 ? 'text-right px-3' : i === 4 ? 'text-center px-5' : 'text-left px-3'}`}
+                    >
+                      <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>
+                        {h}
+                      </span>
+                    </th>
+                  ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody>
                 {filtered.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="py-16 text-center">
                       <p className="text-4xl mb-3">💰</p>
-                      <p className="font-semibold text-gray-500">Belum ada transaksi di bulan ini</p>
+                      <p className="font-semibold" style={{ color: '#6b6560' }}>Belum ada transaksi di bulan ini</p>
                     </td>
                   </tr>
                 ) : (
                   filtered.map(t => (
-                    <tr key={t.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-5 py-3 text-gray-500 text-xs">
+                    <tr
+                      key={t.id}
+                      className="table-row-hover transition-colors"
+                      style={{ borderBottom: '1px solid #faf9f7' }}
+                      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#faf9f7' }}
+                      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                    >
+                      <td className="px-5 py-3 text-xs" style={{ color: '#6b6560' }}>
                         {new Date(t.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="px-3 py-3 font-mono text-xs text-gray-400 hidden md:table-cell">{t.orderNumber ?? '-'}</td>
-                      <td className="px-3 py-3">
-                        <p className="font-semibold text-gray-800">{t.description}</p>
-                        {t.customerName && <p className="text-xs text-gray-400 mt-0.5">{t.customerName}</p>}
+                      <td className="px-3 py-3 font-mono text-xs hidden md:table-cell" style={{ color: '#9c9690' }}>
+                        {t.orderNumber ?? '—'}
                       </td>
-                      <td className={`px-3 py-3 text-right font-black ${t.type === 'masuk' ? 'text-green-600' : 'text-red-500'}`}>
-                        {t.type === 'masuk' ? '+' : '-'}{formatRupiah(t.amount)}
+                      <td className="px-3 py-3">
+                        <p className="font-semibold text-sm" style={{ color: '#100e0b' }}>{t.description}</p>
+                        {t.customerName && (
+                          <p className="text-xs mt-0.5" style={{ color: '#9c9690' }}>{t.customerName}</p>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 text-right">
+                        <span
+                          className="font-mono font-black text-sm"
+                          style={{ color: t.type === 'masuk' ? '#16a34a' : '#dc2626' }}
+                        >
+                          {t.type === 'masuk' ? '+' : '−'}{formatRupiah(t.amount)}
+                        </span>
                       </td>
                       <td className="px-5 py-3 text-center">
-                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${t.type === 'masuk' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-600'}`}>
+                        <span
+                          className="text-[11px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1"
+                          style={t.type === 'masuk'
+                            ? { background: 'rgba(22,163,74,0.10)', color: '#15803d' }
+                            : { background: 'rgba(220,38,38,0.10)', color: '#b91c1c' }
+                          }
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ background: t.type === 'masuk' ? '#16a34a' : '#dc2626' }}
+                          />
                           {t.type === 'masuk' ? 'Masuk' : 'Keluar'}
                         </span>
                       </td>
@@ -253,33 +337,104 @@ function FinanceContent() {
       </div>
 
       {/* Add Transaction Modal */}
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="Tambah Catatan Keuangan">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="Tambah Catatan Keuangan" accentColor="#16a34a">
         <div className="px-6 py-5 space-y-4">
+          {[
+            {
+              id: 'fDate', label: 'Tanggal', error: fErrors.date,
+              input: <input id="fDate" type="date" value={fDate} onChange={e => setFDate(e.target.value)} style={inputStyle} {...focusStyle} />,
+            },
+          ].map(f => (
+            <div key={f.id}>
+              <label htmlFor={f.id} className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#9c9690' }}>
+                {f.label}
+              </label>
+              {f.input}
+              {f.error && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>{f.error}</p>}
+            </div>
+          ))}
+
           <div>
-            <label htmlFor="fDate" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Tanggal</label>
-            <input id="fDate" type="date" value={fDate} onChange={e => setFDate(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            {fErrors.date && <p className="text-red-500 text-xs mt-1">{fErrors.date}</p>}
-          </div>
-          <div>
-            <label htmlFor="fType" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Tipe Transaksi</label>
-            <select id="fType" value={fType} onChange={e => setFType(e.target.value as TransactionType)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <label htmlFor="fType" className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#9c9690' }}>
+              Tipe Transaksi
+            </label>
+            <select
+              id="fType"
+              value={fType}
+              onChange={e => setFType(e.target.value as TransactionType)}
+              style={{ ...inputStyle, appearance: 'none' }}
+              {...focusStyle}
+            >
               <option value="masuk">Pemasukan</option>
               <option value="keluar">Pengeluaran</option>
             </select>
           </div>
+
           <div>
-            <label htmlFor="fAmount" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nominal (Rp)</label>
-            <input id="fAmount" type="number" min={1} value={fAmount} onChange={e => setFAmount(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="500000" />
-            {fErrors.amount && <p className="text-red-500 text-xs mt-1">{fErrors.amount}</p>}
+            <label htmlFor="fAmount" className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#9c9690' }}>
+              Nominal (Rp)
+            </label>
+            <input
+              id="fAmount"
+              type="number"
+              min={1}
+              value={fAmount}
+              onChange={e => setFAmount(e.target.value)}
+              placeholder="500000"
+              style={inputStyle}
+              {...focusStyle}
+            />
+            {fErrors.amount && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>{fErrors.amount}</p>}
           </div>
+
           <div>
-            <label htmlFor="fDesc" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Keterangan</label>
-            <textarea id="fDesc" value={fDesc} onChange={e => setFDesc(e.target.value)} rows={2} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Biaya operasional, pembayaran pesanan, dll" />
-            {fErrors.desc && <p className="text-red-500 text-xs mt-1">{fErrors.desc}</p>}
+            <label htmlFor="fDesc" className="block text-[11px] font-bold uppercase tracking-wider mb-1.5" style={{ color: '#9c9690' }}>
+              Keterangan
+            </label>
+            <textarea
+              id="fDesc"
+              value={fDesc}
+              onChange={e => setFDesc(e.target.value)}
+              rows={2}
+              placeholder="Biaya operasional, pembayaran pesanan, dll"
+              style={{ ...inputStyle, resize: 'none' }}
+              onFocus={e => {
+                e.target.style.borderColor = '#4f46e5'
+                e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#ddd9d3'
+                e.target.style.boxShadow = 'none'
+              }}
+            />
+            {fErrors.desc && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>{fErrors.desc}</p>}
           </div>
+
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setShowForm(false)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors">Batal</button>
-            <button onClick={addTransaction} className="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors">Simpan</button>
+            <button
+              onClick={() => setShowForm(false)}
+              className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: 'transparent', border: '1px solid #e8e4de', color: '#6b6560' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f7f6f3' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+            >
+              Batal
+            </button>
+            <button
+              onClick={addTransaction}
+              className="flex-1 px-4 py-2.5 rounded-xl text-white text-sm font-bold transition-all"
+              style={{ background: '#4f46e5' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#4338ca'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#4f46e5'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
+            >
+              Simpan
+            </button>
           </div>
         </div>
       </Modal>

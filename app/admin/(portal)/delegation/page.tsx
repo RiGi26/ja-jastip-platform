@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react'
 import { Plus, Shield, UserCheck, UserX, Key, Trash2 } from 'lucide-react'
-import { storage, STORAGE_KEYS } from '@/lib/storage'
 import { getUsers, saveUsers, generateId, refreshSessionPermissions } from '@/lib/auth'
 import { PERMISSION_LABELS, ALL_PERMISSIONS } from '@/lib/permissions'
 import type { AdminUser, PermissionKey } from '@/lib/types'
@@ -12,18 +11,64 @@ import ConfirmDialog from '@/components/admin/shared/ConfirmDialog'
 import { ToastProvider, useToast } from '@/components/admin/shared/Toast'
 import { useAuth } from '@/contexts/AuthContext'
 
-function PermissionToggle({ keyName, checked, onChange }: { keyName: PermissionKey; checked: boolean; onChange: (v: boolean) => void }) {
+const inputStyle: React.CSSProperties = {
+  width: '100%',
+  padding: '10px 14px',
+  border: '1px solid #ddd9d3',
+  borderRadius: '10px',
+  background: '#ffffff',
+  color: '#100e0b',
+  fontSize: '0.875rem',
+  fontFamily: 'inherit',
+  outline: 'none',
+  transition: 'border-color 150ms, box-shadow 150ms',
+}
+
+const focusHandlers = {
+  onFocus: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    e.target.style.borderColor = '#4f46e5'
+    e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
+  },
+  onBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    e.target.style.borderColor = '#ddd9d3'
+    e.target.style.boxShadow = 'none'
+  },
+}
+
+function PermissionToggle({
+  keyName, checked, onChange,
+}: {
+  keyName: PermissionKey; checked: boolean; onChange: (v: boolean) => void
+}) {
   return (
-    <label className="flex items-center justify-between p-3 rounded-xl border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
-      <span className="text-sm font-medium text-gray-700">{PERMISSION_LABELS[keyName]}</span>
+    <label
+      className="flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors"
+      style={{
+        border: checked ? '1px solid rgba(79,70,229,0.25)' : '1px solid #e8e4de',
+        background: checked ? 'rgba(79,70,229,0.04)' : 'transparent',
+      }}
+      onMouseEnter={e => {
+        if (!checked) (e.currentTarget as HTMLElement).style.background = '#faf9f7'
+      }}
+      onMouseLeave={e => {
+        if (!checked) (e.currentTarget as HTMLElement).style.background = 'transparent'
+      }}
+    >
+      <span className="text-sm font-medium" style={{ color: '#100e0b' }}>
+        {PERMISSION_LABELS[keyName]}
+      </span>
       <button
         type="button"
         role="switch"
         aria-checked={checked}
         onClick={() => onChange(!checked)}
-        className={`relative w-10 h-5 rounded-full transition-colors flex-shrink-0 ${checked ? 'bg-blue-600' : 'bg-gray-200'}`}
+        className="relative w-10 h-5 rounded-full transition-colors flex-shrink-0"
+        style={{ background: checked ? '#4f46e5' : '#ddd9d3' }}
       >
-        <span className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${checked ? 'translate-x-5' : 'translate-x-0.5'}`} />
+        <span
+          className="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform"
+          style={{ transform: checked ? 'translateX(20px)' : 'translateX(2px)' }}
+        />
       </button>
     </label>
   )
@@ -38,7 +83,6 @@ function DelegationContent() {
   const [deleteTarget, setDeleteTarget] = useState<AdminUser | null>(null)
   const [resetTarget, setResetTarget] = useState<AdminUser | null>(null)
 
-  // Add form
   const [fName, setFName] = useState('')
   const [fUsername, setFUsername] = useState('')
   const [fPassword, setFPassword] = useState('')
@@ -47,16 +91,14 @@ function DelegationContent() {
   const [fNotes, setFNotes] = useState('')
   const [fErrors, setFErrors] = useState<Record<string, string>>({})
   const [successInfo, setSuccessInfo] = useState<{ username: string; password: string } | null>(null)
-
-  // Edit perms
   const [editPerms, setEditPerms] = useState<PermissionKey[]>([])
 
   if (!isOwner) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-center">
         <p className="text-5xl mb-4">🔒</p>
-        <p className="font-black text-gray-700 text-lg">Akses Terbatas</p>
-        <p className="text-gray-400 text-sm mt-1">
+        <p className="font-extrabold text-lg" style={{ color: '#100e0b' }}>Akses Terbatas</p>
+        <p className="text-sm mt-1" style={{ color: '#9c9690' }}>
           Halaman ini hanya bisa diakses oleh pemilik usaha.
         </p>
       </div>
@@ -146,62 +188,108 @@ function DelegationContent() {
     else setArr([...arr, key])
   }
 
+  const FieldLabel = ({ htmlFor, children }: { htmlFor?: string; children: React.ReactNode }) => (
+    <label
+      htmlFor={htmlFor}
+      className="block text-[11px] font-bold uppercase tracking-wider mb-1.5"
+      style={{ color: '#9c9690' }}
+    >
+      {children}
+    </label>
+  )
+
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 font-jakarta">
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-black text-gray-900">Delegasi Admin</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Kelola sub-admin dan izin akses mereka</p>
+          <h1 className="text-xl font-extrabold tracking-tight" style={{ color: '#100e0b' }}>
+            Delegasi Admin
+          </h1>
+          <p className="text-sm mt-0.5" style={{ color: '#9c9690' }}>
+            Kelola sub-admin dan izin akses mereka
+          </p>
         </div>
         <button
           onClick={() => setShowAdd(true)}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-bold transition-all"
+          style={{ background: '#4f46e5' }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = '#4338ca'
+            e.currentTarget.style.transform = 'translateY(-1px)'
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(79,70,229,0.35)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = '#4f46e5'
+            e.currentTarget.style.transform = 'translateY(0)'
+            e.currentTarget.style.boxShadow = 'none'
+          }}
         >
-          <Plus size={15} />
+          <Plus size={14} />
           Tambah Sub-Admin
         </button>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{ background: '#ffffff', border: '1px solid #e8e4de', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider px-5 py-3">Admin</th>
-                <th className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-3 hidden md:table-cell">Dibuat</th>
-                <th className="text-left text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-3">Izin Aktif</th>
-                <th className="text-center text-xs font-bold text-gray-400 uppercase tracking-wider px-3 py-3">Status</th>
-                <th className="text-center text-xs font-bold text-gray-400 uppercase tracking-wider px-5 py-3">Aksi</th>
+            <thead>
+              <tr style={{ background: '#faf9f7', borderBottom: '1px solid #f0ede8' }}>
+                {['Admin', 'Dibuat', 'Izin Aktif', 'Status', 'Aksi'].map((h, i) => (
+                  <th
+                    key={h}
+                    className={`py-3 ${i === 0 ? 'text-left px-5' : i === 1 ? 'text-left px-3 hidden md:table-cell' : i === 2 ? 'text-left px-3' : 'text-center px-3'} ${i === 4 ? 'px-5' : ''}`}
+                  >
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>
+                      {h}
+                    </span>
+                  </th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {users.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-16 text-center">
                     <p className="text-4xl mb-3">👥</p>
-                    <p className="font-semibold text-gray-500">Belum ada sub-admin</p>
-                    <p className="text-gray-400 text-xs mt-1">Tambah sub-admin untuk mendelegasikan pekerjaan</p>
+                    <p className="font-semibold" style={{ color: '#6b6560' }}>Belum ada sub-admin</p>
+                    <p className="text-xs mt-1" style={{ color: '#9c9690' }}>
+                      Tambah sub-admin untuk mendelegasikan pekerjaan
+                    </p>
                   </td>
                 </tr>
               ) : (
                 users.map(u => (
-                  <tr key={u.id} className="hover:bg-gray-50 transition-colors">
+                  <tr
+                    key={u.id}
+                    className="table-row-hover transition-colors"
+                    style={{ borderBottom: '1px solid #faf9f7' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#faf9f7' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
+                  >
                     <td className="px-5 py-3">
-                      <p className="font-bold text-gray-800">{u.name}</p>
-                      <p className="text-xs text-gray-400 font-mono">@{u.username}</p>
-                      {u.notes && <p className="text-xs text-gray-400 mt-0.5">{u.notes}</p>}
+                      <p className="font-bold" style={{ color: '#100e0b' }}>{u.name}</p>
+                      <p className="text-xs font-mono mt-0.5" style={{ color: '#9c9690' }}>@{u.username}</p>
+                      {u.notes && <p className="text-xs mt-0.5" style={{ color: '#9c9690' }}>{u.notes}</p>}
                     </td>
-                    <td className="px-3 py-3 text-gray-500 text-xs hidden md:table-cell">
+                    <td className="px-3 py-3 text-xs hidden md:table-cell" style={{ color: '#9c9690' }}>
                       {new Date(u.createdAt).toLocaleDateString('id-ID')}
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex flex-wrap gap-1">
                         {u.permissions.length === 0 ? (
-                          <span className="text-xs text-gray-400">Tidak ada izin</span>
+                          <span className="text-xs" style={{ color: '#9c9690' }}>Tidak ada izin</span>
                         ) : (
                           u.permissions.map(p => (
-                            <span key={p} className="text-[10px] bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded-full">
+                            <span
+                              key={p}
+                              className="text-[10px] font-bold px-2 py-0.5 rounded-full"
+                              style={{ background: 'rgba(79,70,229,0.08)', color: '#4f46e5' }}
+                            >
                               {PERMISSION_LABELS[p].split(' ').slice(0, 2).join(' ')}
                             </span>
                           ))
@@ -209,18 +297,53 @@ function DelegationContent() {
                       </div>
                     </td>
                     <td className="px-3 py-3 text-center">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${u.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      <span
+                        className="text-[11px] font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1"
+                        style={u.isActive
+                          ? { background: 'rgba(22,163,74,0.10)', color: '#15803d' }
+                          : { background: '#f0ede8', color: '#9c9690' }
+                        }
+                      >
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ background: u.isActive ? '#16a34a' : '#c8c3bc' }}
+                        />
                         {u.isActive ? 'Aktif' : 'Nonaktif'}
                       </span>
                     </td>
                     <td className="px-5 py-3">
-                      <div className="flex items-center justify-center gap-1">
-                        <button onClick={() => openEdit(u)} title="Edit izin" aria-label="Edit izin" className="p-1.5 rounded-lg text-gray-400 hover:text-blue-600 hover:bg-blue-50 transition-colors"><Shield size={15} /></button>
-                        <button onClick={() => setResetTarget(u)} title="Reset password" aria-label="Reset password" className="p-1.5 rounded-lg text-gray-400 hover:text-amber-600 hover:bg-amber-50 transition-colors"><Key size={15} /></button>
-                        <button onClick={() => toggleActive(u)} title={u.isActive ? 'Nonaktifkan' : 'Aktifkan'} aria-label={u.isActive ? 'Nonaktifkan akun' : 'Aktifkan akun'} className="p-1.5 rounded-lg text-gray-400 hover:text-green-600 hover:bg-green-50 transition-colors">
-                          {u.isActive ? <UserX size={15} /> : <UserCheck size={15} />}
-                        </button>
-                        <button onClick={() => setDeleteTarget(u)} title="Hapus" aria-label="Hapus akun" className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors"><Trash2 size={15} /></button>
+                      <div className="flex items-center justify-center gap-0.5">
+                        {[
+                          { icon: <Shield size={14} />, label: 'Edit izin', color: '#4f46e5', bg: 'rgba(79,70,229,0.08)', onClick: () => openEdit(u) },
+                          { icon: <Key size={14} />, label: 'Reset password', color: '#d97706', bg: 'rgba(217,119,6,0.08)', onClick: () => setResetTarget(u) },
+                          {
+                            icon: u.isActive ? <UserX size={14} /> : <UserCheck size={14} />,
+                            label: u.isActive ? 'Nonaktifkan' : 'Aktifkan',
+                            color: '#16a34a',
+                            bg: 'rgba(22,163,74,0.08)',
+                            onClick: () => toggleActive(u),
+                          },
+                          { icon: <Trash2 size={14} />, label: 'Hapus', color: '#dc2626', bg: 'rgba(220,38,38,0.08)', onClick: () => setDeleteTarget(u) },
+                        ].map((action, idx) => (
+                          <button
+                            key={idx}
+                            onClick={action.onClick}
+                            title={action.label}
+                            aria-label={action.label}
+                            className="p-1.5 rounded-lg transition-all"
+                            style={{ color: '#9c9690' }}
+                            onMouseEnter={e => {
+                              e.currentTarget.style.background = action.bg
+                              e.currentTarget.style.color = action.color
+                            }}
+                            onMouseLeave={e => {
+                              e.currentTarget.style.background = 'transparent'
+                              e.currentTarget.style.color = '#9c9690'
+                            }}
+                          >
+                            {action.icon}
+                          </button>
+                        ))}
                       </div>
                     </td>
                   </tr>
@@ -234,46 +357,107 @@ function DelegationContent() {
       {/* Add Admin Modal */}
       <Modal open={showAdd} onClose={() => setShowAdd(false)} title="Tambah Sub-Admin Baru" maxWidth="max-w-lg">
         <div className="px-6 py-5 space-y-4">
-          <div>
-            <label htmlFor="fName" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
-            <input id="fName" type="text" value={fName} onChange={e => setFName(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Nama admin baru" />
-            {fErrors.name && <p className="text-red-500 text-xs mt-1">{fErrors.name}</p>}
-          </div>
-          <div>
-            <label htmlFor="fUsername" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Username</label>
-            <input id="fUsername" type="text" value={fUsername} onChange={e => setFUsername(e.target.value.toLowerCase())} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="admin2" />
-            {fErrors.username && <p className="text-red-500 text-xs mt-1">{fErrors.username}</p>}
-          </div>
+          {[
+            { id: 'fName', label: 'Nama Lengkap', value: fName, onChange: setFName, placeholder: 'Nama admin baru', error: fErrors.name, type: 'text' },
+            { id: 'fUsername', label: 'Username', value: fUsername, onChange: (v: string) => setFUsername(v.toLowerCase()), placeholder: 'admin2', error: fErrors.username, type: 'text' },
+          ].map(f => (
+            <div key={f.id}>
+              <FieldLabel htmlFor={f.id}>{f.label}</FieldLabel>
+              <input
+                id={f.id}
+                type={f.type}
+                value={f.value}
+                onChange={e => f.onChange(e.target.value)}
+                placeholder={f.placeholder}
+                style={inputStyle}
+                {...focusHandlers}
+              />
+              {f.error && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>{f.error}</p>}
+            </div>
+          ))}
+
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label htmlFor="fPassword" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Password</label>
-              <input id="fPassword" type="password" value={fPassword} onChange={e => setFPassword(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="min 8 karakter" />
-              {fErrors.password && <p className="text-red-500 text-xs mt-1">{fErrors.password}</p>}
-            </div>
-            <div>
-              <label htmlFor="fConfirm" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Konfirmasi</label>
-              <input id="fConfirm" type="password" value={fConfirm} onChange={e => setFConfirm(e.target.value)} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="ulangi password" />
-              {fErrors.confirm && <p className="text-red-500 text-xs mt-1">{fErrors.confirm}</p>}
-            </div>
+            {[
+              { id: 'fPassword', label: 'Password', value: fPassword, onChange: setFPassword, placeholder: 'min 8 karakter', error: fErrors.password },
+              { id: 'fConfirm', label: 'Konfirmasi', value: fConfirm, onChange: setFConfirm, placeholder: 'ulangi password', error: fErrors.confirm },
+            ].map(f => (
+              <div key={f.id}>
+                <FieldLabel htmlFor={f.id}>{f.label}</FieldLabel>
+                <input
+                  id={f.id}
+                  type="password"
+                  value={f.value}
+                  onChange={e => f.onChange(e.target.value)}
+                  placeholder={f.placeholder}
+                  style={inputStyle}
+                  {...focusHandlers}
+                />
+                {f.error && <p className="text-xs mt-1" style={{ color: '#dc2626' }}>{f.error}</p>}
+              </div>
+            ))}
           </div>
 
           <div>
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Izin Akses</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: '#9c9690' }}>
+              Izin Akses
+            </p>
             <div className="space-y-2">
               {ALL_PERMISSIONS.map(key => (
-                <PermissionToggle key={key} keyName={key} checked={fPerms.includes(key)} onChange={() => togglePerm(key, fPerms, setFPerms)} />
+                <PermissionToggle
+                  key={key}
+                  keyName={key}
+                  checked={fPerms.includes(key)}
+                  onChange={() => togglePerm(key, fPerms, setFPerms)}
+                />
               ))}
             </div>
           </div>
 
           <div>
-            <label htmlFor="fNotes" className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1.5">Catatan (opsional)</label>
-            <textarea id="fNotes" value={fNotes} onChange={e => setFNotes(e.target.value)} rows={2} className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Deskripsi peran admin ini..." />
+            <FieldLabel htmlFor="fNotes">Catatan (opsional)</FieldLabel>
+            <textarea
+              id="fNotes"
+              value={fNotes}
+              onChange={e => setFNotes(e.target.value)}
+              rows={2}
+              placeholder="Deskripsi peran admin ini..."
+              style={{ ...inputStyle, resize: 'none' }}
+              onFocus={e => {
+                e.target.style.borderColor = '#4f46e5'
+                e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
+              }}
+              onBlur={e => {
+                e.target.style.borderColor = '#ddd9d3'
+                e.target.style.boxShadow = 'none'
+              }}
+            />
           </div>
 
           <div className="flex gap-3 pt-2">
-            <button onClick={() => setShowAdd(false)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors">Batal</button>
-            <button onClick={addAdmin} className="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors">Simpan</button>
+            <button
+              onClick={() => setShowAdd(false)}
+              className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: 'transparent', border: '1px solid #e8e4de', color: '#6b6560' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f7f6f3' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+            >
+              Batal
+            </button>
+            <button
+              onClick={addAdmin}
+              className="flex-1 px-4 py-2.5 rounded-xl text-white text-sm font-bold transition-all"
+              style={{ background: '#4f46e5' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#4338ca'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#4f46e5'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
+            >
+              Simpan
+            </button>
           </div>
         </div>
       </Modal>
@@ -281,29 +465,80 @@ function DelegationContent() {
       {/* Edit Permissions SlideOver */}
       <SlideOver open={!!editUser} onClose={() => setEditUser(null)} title={`Edit Izin: ${editUser?.name}`}>
         <div className="px-6 py-5 space-y-4">
-          <p className="text-sm text-gray-500">Atur izin akses untuk <strong>{editUser?.name}</strong> (@{editUser?.username})</p>
+          <p className="text-sm" style={{ color: '#6b6560' }}>
+            Atur izin akses untuk <strong style={{ color: '#100e0b' }}>{editUser?.name}</strong>{' '}
+            <span className="font-mono" style={{ color: '#9c9690' }}>(@{editUser?.username})</span>
+          </p>
           <div className="space-y-2">
             {ALL_PERMISSIONS.map(key => (
-              <PermissionToggle key={key} keyName={key} checked={editPerms.includes(key)} onChange={() => togglePerm(key, editPerms, setEditPerms)} />
+              <PermissionToggle
+                key={key}
+                keyName={key}
+                checked={editPerms.includes(key)}
+                onChange={() => togglePerm(key, editPerms, setEditPerms)}
+              />
             ))}
           </div>
           <div className="flex gap-3 pt-4">
-            <button onClick={() => setEditUser(null)} className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors">Batal</button>
-            <button onClick={saveEditPerms} className="flex-1 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors">Simpan Izin</button>
+            <button
+              onClick={() => setEditUser(null)}
+              className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: 'transparent', border: '1px solid #e8e4de', color: '#6b6560' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f7f6f3' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+            >
+              Batal
+            </button>
+            <button
+              onClick={saveEditPerms}
+              className="flex-1 px-4 py-2.5 rounded-xl text-white text-sm font-bold transition-all"
+              style={{ background: '#4f46e5' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#4338ca'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#4f46e5'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
+            >
+              Simpan Izin
+            </button>
           </div>
         </div>
       </SlideOver>
 
-      {/* Success modal (show credentials) */}
-      <Modal open={!!successInfo} onClose={() => setSuccessInfo(null)} title="Akun Berhasil Dibuat">
+      {/* Success modal (credentials) */}
+      <Modal open={!!successInfo} onClose={() => setSuccessInfo(null)} title="Akun Berhasil Dibuat" accentColor="#16a34a">
         <div className="px-6 py-5 space-y-4">
-          <p className="text-sm text-gray-600">Berikut informasi akun sub-admin. Kirimkan ke yang bersangkutan:</p>
-          <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 font-mono text-sm space-y-2">
-            <div className="flex justify-between"><span className="text-blue-500">Username:</span><span className="font-black text-blue-800">{successInfo?.username}</span></div>
-            <div className="flex justify-between"><span className="text-blue-500">Password:</span><span className="font-black text-blue-800">{successInfo?.password}</span></div>
+          <p className="text-sm" style={{ color: '#6b6560' }}>
+            Berikut informasi akun sub-admin. Kirimkan ke yang bersangkutan:
+          </p>
+          <div
+            className="rounded-xl p-4 font-mono text-sm space-y-2"
+            style={{ background: '#f0fdf4', border: '1px solid rgba(22,163,74,0.20)' }}
+          >
+            <div className="flex justify-between">
+              <span style={{ color: '#16a34a' }}>Username:</span>
+              <span className="font-black" style={{ color: '#15803d' }}>{successInfo?.username}</span>
+            </div>
+            <div className="flex justify-between">
+              <span style={{ color: '#16a34a' }}>Password:</span>
+              <span className="font-black" style={{ color: '#15803d' }}>{successInfo?.password}</span>
+            </div>
           </div>
-          <p className="text-xs text-gray-400">Simpan info ini dengan aman. Password tidak dapat dilihat lagi setelah ditutup.</p>
-          <button onClick={() => setSuccessInfo(null)} className="w-full px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors">Tutup</button>
+          <p className="text-xs" style={{ color: '#9c9690' }}>
+            Simpan info ini dengan aman. Password tidak dapat dilihat lagi setelah ditutup.
+          </p>
+          <button
+            onClick={() => setSuccessInfo(null)}
+            className="w-full px-4 py-2.5 rounded-xl text-white text-sm font-bold transition-all"
+            style={{ background: '#4f46e5' }}
+            onMouseEnter={e => { e.currentTarget.style.background = '#4338ca' }}
+            onMouseLeave={e => { e.currentTarget.style.background = '#4f46e5' }}
+          >
+            Tutup
+          </button>
         </div>
       </Modal>
 

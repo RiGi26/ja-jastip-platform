@@ -32,6 +32,18 @@ function makeOrderNumber(orders: Order[]): string {
 
 type SortKey = 'createdAt' | 'customerName' | 'total' | 'status'
 
+/* Shared input style */
+const inputStyle: React.CSSProperties = {
+  background: '#ffffff',
+  border: '1px solid #ddd9d3',
+  borderRadius: '10px',
+  color: '#100e0b',
+  fontSize: '0.875rem',
+  fontFamily: 'inherit',
+  outline: 'none',
+  transition: 'border-color 150ms, box-shadow 150ms',
+}
+
 function OrdersContent() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
@@ -111,33 +123,55 @@ function OrdersContent() {
   }, [orders, toast])
 
   function SortIcon({ col }: { col: SortKey }) {
-    if (sortKey !== col) return <ChevronUp size={12} className="text-gray-300" />
-    return sortAsc ? <ChevronUp size={12} className="text-blue-500" /> : <ChevronDown size={12} className="text-blue-500" />
+    if (sortKey !== col) return <ChevronUp size={11} style={{ color: '#c8c3bc' }} />
+    return sortAsc
+      ? <ChevronUp size={11} style={{ color: '#4f46e5' }} />
+      : <ChevronDown size={11} style={{ color: '#4f46e5' }} />
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-5 font-jakarta">
+
+      {/* Header */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h1 className="text-xl font-black text-gray-900">Pesanan Masuk</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{orders.length} total pesanan</p>
+          <h1 className="text-xl font-extrabold tracking-tight" style={{ color: '#100e0b' }}>
+            Pesanan Masuk
+          </h1>
+          <p className="text-sm mt-0.5" style={{ color: '#9c9690' }}>
+            {orders.length} total pesanan
+          </p>
         </div>
         <div className="flex gap-2">
           <PermissionGuard permission="orders.export">
             <button
               onClick={() => exportOrdersCsv(filtered)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold transition-all"
+              style={{ background: '#ffffff', border: '1px solid #e8e4de', color: '#6b6560' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f7f6f3' }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#ffffff' }}
             >
-              <Download size={15} />
+              <Download size={14} />
               Export CSV
             </button>
           </PermissionGuard>
           <PermissionGuard permission="orders.create">
             <button
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold transition-colors"
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-white text-sm font-bold transition-all"
+              style={{ background: '#4f46e5' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = '#4338ca'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(79,70,229,0.35)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = '#4f46e5'
+                e.currentTarget.style.transform = 'translateY(0)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             >
-              <Plus size={15} />
+              <Plus size={14} />
               Tambah Pesanan
             </button>
           </PermissionGuard>
@@ -147,21 +181,39 @@ function OrdersContent() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-52">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9c9690' }} />
           <input
             type="text"
             placeholder="Cari nama atau nomor pesanan..."
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(1) }}
-            className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            className="w-full pl-9 pr-4 py-2.5"
+            style={inputStyle}
+            onFocus={e => {
+              e.target.style.borderColor = '#4f46e5'
+              e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
+            }}
+            onBlur={e => {
+              e.target.style.borderColor = '#ddd9d3'
+              e.target.style.boxShadow = 'none'
+            }}
           />
         </div>
         <div className="relative">
-          <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Filter size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: '#9c9690' }} />
           <select
             value={statusFilter}
             onChange={e => { setStatusFilter(e.target.value as OrderStatus | ''); setPage(1) }}
-            className="pl-8 pr-4 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="pl-8 pr-4 py-2.5"
+            style={{ ...inputStyle, appearance: 'none', paddingRight: '32px' }}
+            onFocus={e => {
+              e.target.style.borderColor = '#4f46e5'
+              e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
+            }}
+            onBlur={e => {
+              e.target.style.borderColor = '#ddd9d3'
+              e.target.style.boxShadow = 'none'
+            }}
           >
             <option value="">Semua Status</option>
             {ALL_STATUSES.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
@@ -170,46 +222,53 @@ function OrdersContent() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div
+        className="rounded-2xl overflow-hidden"
+        style={{ background: '#ffffff', border: '1px solid #e8e4de', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
+            <thead>
+              <tr style={{ background: '#faf9f7', borderBottom: '1px solid #f0ede8' }}>
                 <th className="text-left px-5 py-3">
-                  <button onClick={() => handleSort('createdAt')} className="flex items-center gap-1 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Tanggal <SortIcon col="createdAt" />
+                  <button onClick={() => handleSort('createdAt')} className="flex items-center gap-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Tanggal</span>
+                    <SortIcon col="createdAt" />
                   </button>
                 </th>
                 <th className="text-left px-3 py-3">
-                  <button onClick={() => handleSort('customerName')} className="flex items-center gap-1 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                    Pelanggan <SortIcon col="customerName" />
+                  <button onClick={() => handleSort('customerName')} className="flex items-center gap-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Pelanggan</span>
+                    <SortIcon col="customerName" />
                   </button>
                 </th>
                 <th className="text-left px-3 py-3 hidden md:table-cell">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Kategori</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Kategori</span>
                 </th>
                 <th className="text-left px-3 py-3 hidden sm:table-cell">
-                  <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Berat</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Berat</span>
                 </th>
                 <th className="text-right px-3 py-3">
-                  <button onClick={() => handleSort('total')} className="flex items-center gap-1 text-xs font-bold text-gray-400 uppercase tracking-wider ml-auto">
-                    Total <SortIcon col="total" />
+                  <button onClick={() => handleSort('total')} className="flex items-center gap-1 ml-auto">
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Total</span>
+                    <SortIcon col="total" />
                   </button>
                 </th>
                 <th className="text-center px-5 py-3">
-                  <button onClick={() => handleSort('status')} className="flex items-center gap-1 text-xs font-bold text-gray-400 uppercase tracking-wider mx-auto">
-                    Status <SortIcon col="status" />
+                  <button onClick={() => handleSort('status')} className="flex items-center gap-1 mx-auto">
+                    <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: '#9c9690' }}>Status</span>
+                    <SortIcon col="status" />
                   </button>
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {paginated.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="py-16 text-center">
                     <p className="text-4xl mb-3">📦</p>
-                    <p className="font-semibold text-gray-500">Tidak ada pesanan ditemukan</p>
-                    <p className="text-gray-400 text-xs mt-1">Coba ubah filter pencarian</p>
+                    <p className="font-semibold" style={{ color: '#6b6560' }}>Tidak ada pesanan ditemukan</p>
+                    <p className="text-xs mt-1" style={{ color: '#9c9690' }}>Coba ubah filter pencarian</p>
                   </td>
                 </tr>
               ) : (
@@ -217,17 +276,32 @@ function OrdersContent() {
                   <tr
                     key={o.id}
                     onClick={() => setSelectedOrder(o)}
-                    className="hover:bg-blue-50/50 cursor-pointer transition-colors"
+                    className="table-row-hover cursor-pointer transition-colors"
+                    style={{ borderBottom: '1px solid #faf9f7' }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = '#faf9f7' }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'transparent' }}
                   >
                     <td className="px-5 py-3">
-                      <p className="font-mono text-xs text-gray-400">{o.orderNumber}</p>
-                      <p className="text-xs text-gray-500 mt-0.5">{new Date(o.createdAt).toLocaleDateString('id-ID')}</p>
+                      <p className="font-mono text-xs font-semibold" style={{ color: '#6b6560' }}>
+                        {o.orderNumber}
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: '#9c9690' }}>
+                        {new Date(o.createdAt).toLocaleDateString('id-ID')}
+                      </p>
                     </td>
-                    <td className="px-3 py-3 font-semibold text-gray-800">{o.customerName}</td>
-                    <td className="px-3 py-3 text-gray-500 hidden md:table-cell">{o.category}</td>
-                    <td className="px-3 py-3 text-gray-500 hidden sm:table-cell">{o.weightKg}kg</td>
-                    <td className="px-3 py-3 text-right font-bold text-gray-800">{formatRupiah(o.total)}</td>
-                    <td className="px-5 py-3 text-center"><OrderStatusBadge status={o.status} /></td>
+                    <td className="px-3 py-3 font-semibold" style={{ color: '#100e0b' }}>{o.customerName}</td>
+                    <td className="px-3 py-3 hidden md:table-cell text-sm" style={{ color: '#6b6560' }}>{o.category}</td>
+                    <td className="px-3 py-3 hidden sm:table-cell">
+                      <span className="font-mono text-xs" style={{ color: '#6b6560' }}>{o.weightKg}kg</span>
+                    </td>
+                    <td className="px-3 py-3 text-right">
+                      <span className="font-mono font-bold text-sm" style={{ color: '#100e0b' }}>
+                        {formatRupiah(o.total)}
+                      </span>
+                    </td>
+                    <td className="px-5 py-3 text-center">
+                      <OrderStatusBadge status={o.status} />
+                    </td>
                   </tr>
                 ))
               )}
@@ -237,8 +311,11 @@ function OrdersContent() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between px-5 py-3 border-t border-gray-100">
-            <p className="text-xs text-gray-400">
+          <div
+            className="flex items-center justify-between px-5 py-3"
+            style={{ borderTop: '1px solid #f0ede8' }}
+          >
+            <p className="text-xs" style={{ color: '#9c9690' }}>
               Menampilkan {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} dari {filtered.length}
             </p>
             <div className="flex gap-1">
@@ -246,9 +323,16 @@ function OrdersContent() {
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`w-8 h-8 rounded-lg text-xs font-bold transition-colors ${
-                    p === page ? 'bg-blue-600 text-white' : 'text-gray-500 hover:bg-gray-100'
-                  }`}
+                  className="w-8 h-8 rounded-lg text-xs font-bold transition-all"
+                  style={p === page ? {
+                    background: '#4f46e5',
+                    color: '#ffffff',
+                  } : {
+                    background: 'transparent',
+                    color: '#6b6560',
+                  }}
+                  onMouseEnter={e => { if (p !== page) e.currentTarget.style.background = '#f7f6f3' }}
+                  onMouseLeave={e => { if (p !== page) e.currentTarget.style.background = 'transparent' }}
                 >
                   {p}
                 </button>
@@ -264,11 +348,7 @@ function OrdersContent() {
       </Modal>
 
       {/* Order Detail SlideOver */}
-      <SlideOver
-        open={!!selectedOrder}
-        onClose={() => setSelectedOrder(null)}
-        title="Detail Pesanan"
-      >
+      <SlideOver open={!!selectedOrder} onClose={() => setSelectedOrder(null)} title="Detail Pesanan">
         {selectedOrder && (
           <OrderDetail
             order={selectedOrder}
@@ -284,7 +364,14 @@ function OrdersContent() {
 export default function OrdersPage() {
   return (
     <ToastProvider>
-      <Suspense fallback={<div className="flex items-center justify-center h-64"><span className="inline-block w-6 h-6 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin" /></div>}>
+      <Suspense fallback={
+        <div className="flex items-center justify-center h-64">
+          <div
+            className="w-6 h-6 border-2 rounded-full animate-spin"
+            style={{ borderColor: 'rgba(79,70,229,0.2)', borderTopColor: '#4f46e5' }}
+          />
+        </div>
+      }>
         <OrdersContent />
       </Suspense>
     </ToastProvider>

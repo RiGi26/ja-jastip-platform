@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, HelpCircle } from 'lucide-react'
 
 interface ConfirmDialogProps {
   open: boolean
@@ -25,34 +25,72 @@ export default function ConfirmDialog({
 }: ConfirmDialogProps) {
   if (!open) return null
 
+  const accentColor = danger ? '#dc2626' : '#d97706'
+  const accentBg    = danger ? 'rgba(220,38,38,0.08)' : 'rgba(217,119,6,0.08)'
+  const Icon        = danger ? AlertTriangle : HelpCircle
+
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/50" onClick={onCancel} />
-      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
-        <div className="flex items-start gap-4 mb-5">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${danger ? 'bg-red-100' : 'bg-amber-100'}`}>
-            <AlertTriangle size={20} className={danger ? 'text-red-600' : 'text-amber-600'} />
+      <div
+        className="absolute inset-0 animate-fade-in"
+        style={{ background: 'rgba(8,12,20,0.65)', backdropFilter: 'blur(6px)' }}
+        onClick={onCancel}
+      />
+      <div
+        className="relative w-full max-w-sm animate-modal-in overflow-hidden"
+        style={{
+          background: '#ffffff',
+          borderRadius: '20px',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.20)',
+        }}
+      >
+        {/* Top accent bar */}
+        <div className="h-0.5 w-full" style={{ background: accentColor }} />
+
+        <div className="p-6">
+          <div className="flex items-start gap-4 mb-5">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{ background: accentBg }}
+            >
+              <Icon size={18} style={{ color: accentColor }} />
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm" style={{ color: '#100e0b' }}>{title}</h3>
+              <p className="text-sm mt-1 leading-relaxed" style={{ color: '#6b6560' }}>{message}</p>
+            </div>
           </div>
-          <div>
-            <h3 className="font-black text-gray-900 text-base">{title}</h3>
-            <p className="text-gray-500 text-sm mt-1">{message}</p>
+
+          <div className="flex gap-3">
+            <button
+              onClick={onCancel}
+              className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+              style={{
+                background: 'transparent',
+                border: '1px solid #e8e4de',
+                color: '#6b6560',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#f7f6f3' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'transparent' }}
+            >
+              {cancelLabel}
+            </button>
+            <button
+              onClick={onConfirm}
+              className="flex-1 px-4 py-2.5 rounded-xl text-white text-sm font-bold transition-all"
+              style={{ background: danger ? '#dc2626' : '#d97706' }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = danger ? '#b91c1c' : '#b45309'
+                e.currentTarget.style.transform = 'translateY(-1px)'
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = danger ? '#dc2626' : '#d97706'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
+            >
+              {confirmLabel}
+            </button>
           </div>
-        </div>
-        <div className="flex gap-3">
-          <button
-            onClick={onCancel}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 text-gray-700 text-sm font-semibold hover:bg-gray-50 transition-colors"
-          >
-            {cancelLabel}
-          </button>
-          <button
-            onClick={onConfirm}
-            className={`flex-1 px-4 py-2.5 rounded-xl text-white text-sm font-bold transition-colors ${
-              danger ? 'bg-red-600 hover:bg-red-500' : 'bg-blue-600 hover:bg-blue-500'
-            }`}
-          >
-            {confirmLabel}
-          </button>
         </div>
       </div>
     </div>

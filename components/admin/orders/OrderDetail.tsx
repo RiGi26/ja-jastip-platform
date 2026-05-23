@@ -24,20 +24,41 @@ export default function OrderDetail({ order, onStatusChange, onDelete }: OrderDe
   const waMsg = `Halo ${order.customerName}! 👋\n\nUpdate pesanan kamu:\n📦 No. Pesanan: ${order.orderNumber}\n📦 Kategori: ${order.category}\n⚖️ Berat: ${order.weightKg}kg\n🚚 Layanan: ${order.service}\n💰 Total: ${formatRupiah(order.total)}\n📍 Status: ${STATUS_LABELS[order.status]}\n\nTerima kasih sudah mempercayai kami! 🙏`
   const waUrl = `https://wa.me/${order.customerWa.replace('+', '')}?text=${encodeURIComponent(waMsg)}`
 
+  const inputStyle: React.CSSProperties = {
+    width: '100%',
+    padding: '10px 14px',
+    border: '1px solid #ddd9d3',
+    borderRadius: '10px',
+    background: '#ffffff',
+    color: '#100e0b',
+    fontSize: '0.875rem',
+    fontFamily: 'inherit',
+    outline: 'none',
+    transition: 'border-color 150ms, box-shadow 150ms',
+    appearance: 'none',
+  }
+
   return (
-    <div className="px-6 py-5 space-y-5">
-      {/* Header info */}
-      <div className="flex items-start justify-between">
+    <div className="px-6 py-5 space-y-5 font-jakarta">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="font-mono text-sm text-gray-400">{order.orderNumber}</p>
-          <h3 className="font-black text-gray-900 text-lg">{order.customerName}</h3>
-          <p className="text-sm text-gray-500">{order.customerWa}</p>
+          <p className="font-mono text-xs font-semibold" style={{ color: '#9c9690' }}>
+            {order.orderNumber}
+          </p>
+          <h3 className="font-extrabold text-lg tracking-tight mt-0.5" style={{ color: '#100e0b' }}>
+            {order.customerName}
+          </h3>
+          <p className="text-sm mt-0.5" style={{ color: '#9c9690' }}>{order.customerWa}</p>
         </div>
         <OrderStatusBadge status={order.status} />
       </div>
 
       {/* Detail rows */}
-      <div className="bg-gray-50 rounded-xl p-4 space-y-2.5 text-sm">
+      <div
+        className="rounded-xl p-4 space-y-2.5 text-sm"
+        style={{ background: '#faf9f7', border: '1px solid #f0ede8' }}
+      >
         {[
           ['Tanggal Order', new Date(order.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })],
           ['Kategori', order.category],
@@ -48,32 +69,50 @@ export default function OrderDetail({ order, onStatusChange, onDelete }: OrderDe
           ['Fragile', order.isFragile ? 'Ya' : 'Tidak'],
         ].map(([label, value]) => (
           <div key={label} className="flex justify-between">
-            <span className="text-gray-500">{label}</span>
-            <span className="font-semibold text-gray-800">{value}</span>
+            <span style={{ color: '#9c9690' }}>{label}</span>
+            <span className="font-semibold" style={{ color: '#100e0b' }}>{value}</span>
           </div>
         ))}
         {order.notes && (
-          <div className="pt-2 border-t border-gray-200">
-            <span className="text-gray-500 block text-xs mb-1">Catatan</span>
-            <span className="text-gray-700">{order.notes}</span>
+          <div className="pt-2" style={{ borderTop: '1px solid #e8e4de' }}>
+            <span className="block text-xs mb-1" style={{ color: '#9c9690' }}>Catatan</span>
+            <span style={{ color: '#6b6560' }}>{order.notes}</span>
           </div>
         )}
       </div>
 
       {/* Total */}
-      <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex justify-between items-center">
-        <span className="text-sm font-bold text-blue-600">Total Pembayaran</span>
-        <span className="text-xl font-black text-blue-700">{formatRupiah(order.total)}</span>
+      <div
+        className="px-4 py-3 rounded-xl flex justify-between items-center"
+        style={{ background: 'rgba(79,70,229,0.06)', border: '1px solid rgba(79,70,229,0.15)' }}
+      >
+        <span className="text-sm font-bold" style={{ color: '#4f46e5' }}>Total Pembayaran</span>
+        <span className="font-mono font-black text-xl" style={{ color: '#3730a3' }}>
+          {formatRupiah(order.total)}
+        </span>
       </div>
 
       {/* Change status */}
       {canChangeStatus && (
         <div>
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Ubah Status Pesanan</p>
+          <p
+            className="text-[11px] font-bold uppercase tracking-wider mb-2"
+            style={{ color: '#9c9690' }}
+          >
+            Ubah Status Pesanan
+          </p>
           <select
             value={order.status}
             onChange={e => setConfirmStatus(e.target.value as OrderStatus)}
-            className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={inputStyle}
+            onFocus={e => {
+              e.target.style.borderColor = '#4f46e5'
+              e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.08)'
+            }}
+            onBlur={e => {
+              e.target.style.borderColor = '#ddd9d3'
+              e.target.style.boxShadow = 'none'
+            }}
           >
             {ALL_STATUSES.map(s => (
               <option key={s} value={s}>{STATUS_LABELS[s]}</option>
@@ -83,20 +122,36 @@ export default function OrderDetail({ order, onStatusChange, onDelete }: OrderDe
       )}
 
       {/* Actions */}
-      <div className="flex gap-3 pt-2">
+      <div className="flex gap-3 pt-1">
         <a
           href={waUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-green-500 hover:bg-green-400 text-white text-sm font-bold transition-colors"
+          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-white text-sm font-bold transition-all"
+          style={{ background: '#16a34a' }}
+          onMouseEnter={e => {
+            (e.currentTarget as HTMLElement).style.background = '#15803d'
+            ;(e.currentTarget as HTMLElement).style.transform = 'translateY(-1px)'
+          }}
+          onMouseLeave={e => {
+            (e.currentTarget as HTMLElement).style.background = '#16a34a'
+            ;(e.currentTarget as HTMLElement).style.transform = 'translateY(0)'
+          }}
         >
           <MessageCircle size={15} />
           Kirim WA
         </a>
         <button
           onClick={() => setConfirmDelete(true)}
-          className="px-4 py-2.5 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 text-sm font-semibold transition-colors"
           aria-label="Hapus pesanan"
+          className="px-4 py-2.5 rounded-xl text-sm font-semibold transition-all"
+          style={{ border: '1px solid rgba(220,38,38,0.25)', color: '#dc2626' }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = 'rgba(220,38,38,0.06)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'transparent'
+          }}
         >
           <Trash2 size={15} />
         </button>

@@ -20,34 +20,59 @@ export default function SlideOver({ open, onClose, title, children }: SlideOverP
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex justify-end transition-all ${
-        open ? 'pointer-events-auto' : 'pointer-events-none'
-      }`}
+      className={`fixed inset-0 z-50 flex justify-end ${open ? 'pointer-events-auto' : 'pointer-events-none'}`}
     >
       {/* Overlay */}
       <div
-        className={`absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity ${
-          open ? 'opacity-100' : 'opacity-0'
-        }`}
         onClick={onClose}
+        className="absolute inset-0 transition-opacity duration-300"
+        style={{
+          background: 'rgba(8,12,20,0.60)',
+          backdropFilter: 'blur(4px)',
+          opacity: open ? 1 : 0,
+        }}
       />
 
       {/* Panel */}
       <div
-        className={`relative bg-white w-full max-w-xl h-full shadow-xl flex flex-col transition-transform duration-300 ${
-          open ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        className="relative w-full max-w-xl h-full flex flex-col transition-transform duration-300 ease-out"
+        style={{
+          background: '#fdfcfb',
+          boxShadow: '-20px 0 60px rgba(0,0,0,0.15)',
+          transform: open ? 'translateX(0)' : 'translateX(100%)',
+          borderLeft: '1px solid #ece9e3',
+        }}
       >
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
-          <h2 className="font-black text-gray-900 text-base">{title}</h2>
+        {/* Top accent */}
+        <div className="h-0.5 w-full flex-shrink-0" style={{ background: '#4f46e5' }} />
+
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          style={{ borderBottom: '1px solid #ece9e3' }}
+        >
+          <h2 className="font-extrabold text-sm tracking-tight" style={{ color: '#100e0b' }}>
+            {title}
+          </h2>
           <button
             onClick={onClose}
             aria-label="Tutup panel"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg transition-colors"
+            style={{ color: '#9c9690' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = '#f0ede8'
+              e.currentTarget.style.color = '#6b6560'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = '#9c9690'
+            }}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
+
+        {/* Content */}
         <div className="flex-1 overflow-y-auto">
           {children}
         </div>

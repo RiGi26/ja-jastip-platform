@@ -9,9 +9,17 @@ interface ModalProps {
   title: string
   children: ReactNode
   maxWidth?: string
+  accentColor?: string
 }
 
-export default function Modal({ open, onClose, title, children, maxWidth = 'max-w-lg' }: ModalProps) {
+export default function Modal({
+  open,
+  onClose,
+  title,
+  children,
+  maxWidth = 'max-w-lg',
+  accentColor = '#4f46e5',
+}: ModalProps) {
   useEffect(() => {
     if (!open) return
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
@@ -23,21 +31,56 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+        className="absolute inset-0 animate-fade-in"
+        style={{ background: 'rgba(8,12,20,0.65)', backdropFilter: 'blur(6px)' }}
         onClick={onClose}
       />
-      <div className={`relative bg-white rounded-2xl shadow-xl w-full ${maxWidth} max-h-[90vh] flex flex-col`}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-shrink-0">
-          <h2 className="font-black text-gray-900 text-base">{title}</h2>
+
+      {/* Panel */}
+      <div
+        className={`relative w-full ${maxWidth} max-h-[90vh] flex flex-col animate-modal-in`}
+        style={{
+          background: '#ffffff',
+          borderRadius: '20px',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.20), 0 8px 20px rgba(0,0,0,0.12)',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Colored top accent */}
+        <div className="h-0.5 w-full flex-shrink-0" style={{ background: accentColor }} />
+
+        {/* Header */}
+        <div
+          className="flex items-center justify-between px-6 py-4 flex-shrink-0"
+          style={{ borderBottom: '1px solid #f0ede8' }}
+        >
+          <h2
+            className="font-extrabold text-sm tracking-tight"
+            style={{ color: '#100e0b' }}
+          >
+            {title}
+          </h2>
           <button
             onClick={onClose}
             aria-label="Tutup modal"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg transition-colors flex-shrink-0"
+            style={{ color: '#9c9690' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.background = '#f0ede8'
+              e.currentTarget.style.color = '#6b6560'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = '#9c9690'
+            }}
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
+
+        {/* Content */}
         <div className="overflow-y-auto flex-1">
           {children}
         </div>

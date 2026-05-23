@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LayoutGrid } from 'lucide-react'
 
 const NAV_LINKS = [
   { label: 'Home',             href: '#'           },
@@ -58,6 +58,17 @@ export default function Navbar() {
 
         {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-2">
+          <a 
+            href="https://ja-landingpage-platform.vercel.app"
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all group ${
+              isDark 
+                ? 'bg-white/10 text-white/70 hover:bg-white/20 hover:text-white' 
+                : 'bg-gray-50 text-gray-500 hover:bg-white hover:text-red-600 hover:shadow-sm border border-black/[0.03]'
+            }`}
+          >
+            <LayoutGrid size={14} className="group-hover:rotate-90 transition-transform duration-500" />
+            Portal Utama
+          </a>
           <a
             href="/admin"
             className={`text-xs font-semibold px-3 py-2 rounded-lg border transition-colors ${

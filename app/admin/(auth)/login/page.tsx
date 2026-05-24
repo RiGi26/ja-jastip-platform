@@ -4,6 +4,8 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Eye, EyeOff, ArrowRight } from 'lucide-react'
 import { useAuth } from '@/contexts/AuthContext'
+import Link from 'next/link'
+import Image from 'next/image'
 
 function LoginForm() {
   const { login, session } = useAuth()
@@ -98,7 +100,7 @@ function LoginForm() {
             value={password}
             onChange={e => setPassword(e.target.value)}
             placeholder="Masukkan password"
-            style={{ ...inputStyle, paddingRight: '48px' }}
+            style={inputStyle}
             onFocus={e => {
               e.target.style.borderColor = 'rgba(165,180,252,0.4)'
               e.target.style.boxShadow = '0 0 0 3px rgba(79,70,229,0.15)'
@@ -110,56 +112,33 @@ function LoginForm() {
           />
           <button
             type="button"
-            onClick={() => setShowPw(v => !v)}
-            aria-label={showPw ? 'Sembunyikan password' : 'Tampilkan password'}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md transition-colors"
-            style={{ color: 'rgba(165,180,252,0.5)' }}
-            onMouseEnter={e => { e.currentTarget.style.color = 'rgba(165,180,252,0.9)' }}
-            onMouseLeave={e => { e.currentTarget.style.color = 'rgba(165,180,252,0.5)' }}
+            onClick={() => setShowPw(!showPw)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
           >
             {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
           </button>
         </div>
       </div>
 
-      {/* Error */}
       {error && (
         <div
-          className="px-4 py-3 rounded-xl text-sm font-medium"
-          style={{ background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.25)', color: '#fca5a5' }}
+          className="text-xs font-bold p-3 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400"
         >
           {error}
         </div>
       )}
 
-      {/* Submit */}
       <button
         type="submit"
         disabled={loading}
-        className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm transition-all mt-2"
-        style={{ background: '#4f46e5', color: '#ffffff' }}
-        onMouseEnter={e => {
-          if (!loading) {
-            e.currentTarget.style.background = '#4338ca'
-            e.currentTarget.style.transform = 'translateY(-1px)'
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(79,70,229,0.40)'
-          }
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.background = loading ? '#4f46e5' : '#4f46e5'
-          e.currentTarget.style.transform = 'translateY(0)'
-          e.currentTarget.style.boxShadow = 'none'
-          e.currentTarget.style.opacity = loading ? '0.6' : '1'
+        className="w-full h-12 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition-all flex items-center justify-center gap-2 active:scale-[0.98]"
+        style={{
+          boxShadow: '0 4px 20px rgba(79,70,229,0.3)',
+          opacity: loading ? '0.6' : '1'
         }}
       >
         {loading ? (
-          <>
-            <span
-              className="inline-block w-4 h-4 border-2 rounded-full animate-spin"
-              style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#ffffff' }}
-            />
-            Memproses...
-          </>
+          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
           <>
             Masuk ke Portal
@@ -189,28 +168,34 @@ export default function LoginPage() {
 
         {/* Logo block */}
         <div className="text-center mb-10">
-          <div className="inline-flex flex-col items-center gap-3">
-            <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
-              style={{
-                background: 'rgba(232,48,58,0.12)',
-                border: '1px solid rgba(232,48,58,0.25)',
-              }}
-            >
-              🇯🇵
+          <Link 
+            href="https://ja-landingpage-platform.vercel.app" 
+            className="group inline-flex flex-col items-center gap-4 transition-all"
+            title="Kembali ke Portal Utama"
+          >
+            <div className="relative">
+              <Image 
+                src="/images/Icon.png" 
+                alt="Logo" 
+                width={56} height={56} 
+                className="object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500"
+              />
+              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 backdrop-blur-md text-white text-[8px] px-2 py-0.5 rounded-full whitespace-nowrap pointer-events-none uppercase tracking-widest font-bold border border-white/10">
+                Beranda
+              </div>
             </div>
-            <div>
+            <div className="text-center">
               <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: '#f0f4ff' }}>
                 JapanArena
               </h1>
               <p
-                className="text-[11px] font-bold tracking-widest uppercase mt-0.5"
+                className="text-[11px] font-bold tracking-[0.2em] uppercase mt-1"
                 style={{ color: '#e8303a' }}
               >
-                Admin Portal
+                Jastip Portal
               </p>
             </div>
-          </div>
+          </Link>
         </div>
 
         {/* Login card */}

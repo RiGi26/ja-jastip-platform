@@ -2,7 +2,8 @@
 
 import { Suspense, useState, useMemo, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { Plus, Search, Download, ChevronUp, ChevronDown, Filter, Package } from 'lucide-react'
+import { Plus, Search, Download, ChevronUp, ChevronDown, Filter, Package, X } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { storage, STORAGE_KEYS } from '@/lib/storage'
 import { MOCK_ORDERS } from '@/lib/mock-orders'
 import { formatRupiah } from '@/lib/calculator'

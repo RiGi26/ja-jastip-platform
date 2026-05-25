@@ -45,7 +45,7 @@ interface SidebarProps {
 
 export default function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onCloseMobile }: SidebarProps) {
   const pathname = usePathname()
-  const { session, isOwner, hasPermission } = useAuth()
+  const { session, isOwner, hasPermission, logout } = useAuth()
   const { settings } = useSettings()
 
   function isVisible(item: NavItem): boolean {

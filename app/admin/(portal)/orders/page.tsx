@@ -45,6 +45,10 @@ function OrdersContent() {
 
   const [showForm, setShowForm] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  
+  // Batch Update State
+  const [selectedIds, setSelectedIds] = useState<string[]>([])
+  const [batchStatus, setBatchStatus] = useState<OrderStatus | ''>('')
 
   useEffect(() => {
     if (searchParams.get('new') === '1') setShowForm(true)
@@ -102,6 +106,34 @@ function OrdersContent() {
     toast(`Status diubah menjadi ${STATUS_LABELS[status]}`)
   }, [orders, selectedOrder, toast])
 
+  const handleBatchStatusUpdate = useCallback(() => {
+    if (!batchStatus || selectedIds.length === 0) return
+    
+    const updated = orders.map(o => 
+      selectedIds.includes(o.id) ? { ...o, status: batchStatus as OrderStatus } : o
+    )
+    saveOrders(updated)
+    setOrders(updated)
+    setSelectedIds([])
+    setBatchStatus('')
+    toast(`${selectedIds.length} pesanan berhasil diperbarui ke ${STATUS_LABELS[batchStatus as OrderStatus]}`)
+  }, [orders, batchStatus, selectedIds, toast])
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === paginated.length) {
+      setSelectedIds([])
+    } else {
+      setSelectedIds(paginated.map(o => o.id))
+    }
+  }
+
+  const toggleSelect = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation()
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+
   const deleteOrder = useCallback((id: string) => {
     const updated = orders.filter(o => o.id !== id)
     saveOrders(updated)
@@ -118,7 +150,7 @@ function OrdersContent() {
   }
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pb-20">
 
       {/* Header Section (Apple Style) */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-6">
@@ -183,7 +215,15 @@ function OrdersContent() {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-gray-50/50 border-b border-black/5">
-                <th className="px-8 py-5">
+                <th className="pl-8 py-5 w-10">
+                  <input 
+                    type="checkbox" 
+                    className="w-4 h-4 rounded border-gray-300 text-apple-blue focus:ring-apple-blue/20 cursor-pointer"
+                    checked={selectedIds.length > 0 && selectedIds.length === paginated.length}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
+                <th className="px-6 py-5">
                   <button onClick={() => handleSort('createdAt')} className="flex items-center gap-2 group">
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400 group-hover:text-gray-600 transition-colors">Tanggal</span>
                     <SortIcon col="createdAt" />
@@ -218,7 +258,7 @@ function OrdersContent() {
             <tbody className="divide-y divide-black/[0.02]">
               {paginated.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="py-24 text-center">
+                  <td colSpan={7} className="py-24 text-center">
                     <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
                         <Package size={32} className="text-gray-300" />
                     </div>
@@ -231,9 +271,17 @@ function OrdersContent() {
                   <tr
                     key={o.id}
                     onClick={() => setSelectedOrder(o)}
-                    className="hover:bg-gray-50/50 cursor-pointer transition-colors group"
+                    className={`hover:bg-gray-50/50 cursor-pointer transition-colors group ${selectedIds.includes(o.id) ? 'bg-apple-blue/[0.02]' : ''}`}
                   >
-                    <td className="px-8 py-5">
+                    <td className="pl-8 py-5" onClick={(e) => e.stopPropagation()}>
+                      <input 
+                        type="checkbox" 
+                        className="w-4 h-4 rounded border-gray-300 text-apple-blue focus:ring-apple-blue/20 cursor-pointer"
+                        checked={selectedIds.includes(o.id)}
+                        onChange={(e) => toggleSelect(e as any, o.id)}
+                      />
+                    </td>
+                    <td className="px-6 py-5">
                       <p className="font-mono text-xs font-bold text-[#1D1D1F]">
                         {o.orderNumber}
                       </p>
@@ -283,6 +331,52 @@ function OrdersContent() {
           </div>
         )}
       </div>
+
+      {/* Batch Action Floating Bar */}
+      <AnimatePresence>
+        {selectedIds.length > 0 && (
+          <motion.div
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-[90%] max-w-2xl bg-[#1D1D1F] text-white p-4 rounded-[28px] shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4 border border-white/10 backdrop-blur-xl"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 bg-apple-blue rounded-full flex items-center justify-center font-bold text-sm">
+                {selectedIds.length}
+              </div>
+              <div>
+                <p className="text-sm font-bold sf-display tracking-tight">Pesanan Terpilih</p>
+                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Pilih aksi massal untuk semua pesanan ini</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <select 
+                value={batchStatus}
+                onChange={(e) => setBatchStatus(e.target.value as OrderStatus)}
+                className="bg-white/10 border border-white/10 rounded-xl px-4 py-2.5 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-apple-blue/50 w-full sm:w-40 appearance-none cursor-pointer"
+              >
+                <option value="" disabled className="text-gray-900">Ubah Status ke...</option>
+                {ALL_STATUSES.map(s => <option key={s} value={s} className="text-gray-900">{STATUS_LABELS[s]}</option>)}
+              </select>
+              <button 
+                onClick={handleBatchStatusUpdate}
+                disabled={!batchStatus}
+                className="bg-apple-blue hover:bg-[#005BB5] disabled:opacity-30 text-white px-6 py-2.5 rounded-xl text-xs font-bold transition-all shadow-lg active:scale-95 whitespace-nowrap"
+              >
+                Update Massal
+              </button>
+              <button 
+                onClick={() => setSelectedIds([])}
+                className="p-2.5 text-gray-400 hover:text-white transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Add Order Modal (Apple Glass Redesigned) */}
       <Modal open={showForm} onClose={() => setShowForm(false)} title="Tambah Pesanan Manual" maxWidth="max-w-2xl">

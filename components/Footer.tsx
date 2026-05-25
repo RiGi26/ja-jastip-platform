@@ -31,7 +31,7 @@ export default function Footer() {
               <a href="#calculator" className="block hover:text-white/70 transition-colors">Smart Calculator</a>
               <a href="#cara-order" className="block hover:text-white/70 transition-colors">Cara Order</a>
               <a href="#kategori"   className="block hover:text-white/70 transition-colors">Kategori Barang</a>
-              <a href="/admin"      className="block hover:text-white/70 transition-colors">Admin Portal →</a>
+              <a href="/admin/dashboard"      className="block hover:text-white/70 transition-colors">Admin Portal →</a>
             </div>
           </div>
 

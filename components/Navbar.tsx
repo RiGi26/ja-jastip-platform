@@ -70,7 +70,7 @@ export default function Navbar() {
             Portal Utama
           </a>
           <a
-            href="/admin"
+            href="/admin/dashboard"
             className={`text-xs font-semibold px-3 py-2 rounded-lg border transition-colors ${
               isDark
                 ? 'border-white/20 text-white/60 hover:text-white hover:border-white/40'
@@ -127,7 +127,7 @@ export default function Navbar() {
             💬 Tanya via WA
           </a>
           <a
-            href="/admin"
+            href="/admin/dashboard"
             onClick={() => setOpen(false)}
             className="block text-center px-4 py-2.5 rounded-xl border border-gray-200 text-gray-500 text-sm font-semibold hover:bg-gray-50 transition-colors mt-1"
           >

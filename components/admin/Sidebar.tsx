@@ -192,6 +192,7 @@ export default function Sidebar({ collapsed, onToggleCollapse, mobileOpen, onClo
         </div>
 
         <button 
+          onClick={logout}
           className={`flex items-center justify-center gap-2 w-full py-2 bg-[#FF3B30]/10 text-[#FF3B30] text-[11px] font-bold rounded-lg hover:bg-[#FF3B30]/20 transition-colors ${collapsed ? 'px-0' : 'px-4'}`}
           title={collapsed ? 'Keluar' : undefined}
         >

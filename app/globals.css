@@ -83,6 +83,20 @@ body {
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  @apply text-[15px] md:text-base;
+}
+
+@layer base {
+  h1 { @apply text-2xl md:text-3xl font-extrabold tracking-tight; }
+  h2 { @apply text-xl md:text-2xl font-bold tracking-tight; }
+  h3 { @apply text-lg md:text-xl font-bold; }
+  h4 { @apply text-base md:text-lg font-semibold; }
+}
+
+@layer utilities {
+  .text-mobile-balance {
+    text-wrap: balance;
+  }
 }
 
 /* ─── Mono utility ───────────────────────────────────────────────────────────── */

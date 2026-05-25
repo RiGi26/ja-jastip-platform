@@ -43,7 +43,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async (username: string, password: string): Promise<{ ok: boolean; error?: string }> => {
       const s = doLogin(username, password)
       if (!s) return { ok: false, error: 'Username atau password salah' }
-      document.cookie = `jastip_auth=1; path=/; max-age=${60 * 60 * 24 * 7}`
+      
+      // Menggunakan Session Cookie (tanpa max-age) agar otomatis terhapus saat browser ditutup
+      document.cookie = `jastip_auth=1; path=/; samesite=strict`
+      
       setSession(s)
       return { ok: true }
     },

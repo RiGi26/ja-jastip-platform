@@ -141,7 +141,7 @@ function LoginForm() {
           <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         ) : (
           <>
-            Masuk ke Portal
+            Login ke Portal
             <ArrowRight size={15} />
           </>
         )}
@@ -210,7 +210,7 @@ export default function LoginPage() {
         >
           <div className="mb-6">
             <h2 className="text-base font-bold" style={{ color: '#f0f4ff' }}>
-              Masuk ke Portal
+              Login ke Portal
             </h2>
             <p className="text-xs mt-1" style={{ color: 'rgba(120,140,180,0.7)' }}>
               Masukkan kredensial admin kamu untuk lanjut

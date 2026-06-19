@@ -167,35 +167,19 @@ export default function LoginPage() {
       <div className="w-full max-w-sm relative">
 
         {/* Logo block */}
-        <div className="text-center mb-10">
-          <Link 
-            href="https://ja-landingpage-platform.vercel.app" 
-            className="group inline-flex flex-col items-center gap-4 transition-all"
-            title="Kembali ke Portal Utama"
-          >
-            <div className="relative">
-              <Image 
-                src="/images/Icon.png" 
-                alt="Logo" 
-                width={56} height={56} 
-                className="object-contain drop-shadow-sm group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 backdrop-blur-md text-white text-[8px] px-2 py-0.5 rounded-full whitespace-nowrap pointer-events-none uppercase tracking-widest font-bold border border-white/10">
-                Beranda
-              </div>
-            </div>
-            <div className="text-center">
-              <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: '#f0f4ff' }}>
-                JapanArena
-              </h1>
-              <p
-                className="text-[11px] font-bold tracking-[0.2em] uppercase mt-1"
-                style={{ color: '#e8303a' }}
-              >
-                Jastip Portal
-              </p>
-            </div>
-          </Link>
+        <div className="text-center mb-10 flex flex-col items-center gap-3">
+          <img src="/logo-rocket.png" alt="Logo Webzoka" className="h-16 w-16 object-contain" />
+          <div className="text-center mt-2">
+            <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: '#f0f4ff' }}>
+              JapanArena
+            </h1>
+            <p
+              className="text-[11px] font-bold tracking-[0.2em] uppercase mt-1"
+              style={{ color: '#e8303a' }}
+            >
+              Jastip Portal
+            </p>
+          </div>
         </div>
 
         {/* Login card */}

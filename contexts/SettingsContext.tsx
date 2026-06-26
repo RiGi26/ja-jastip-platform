@@ -12,7 +12,7 @@ import { storage, STORAGE_KEYS } from '@/lib/storage'
 import type { BusinessSettings } from '@/lib/types'
 
 const DEFAULT_SETTINGS: BusinessSettings = {
-  businessName: 'JapanArena Jastip',
+  businessName: 'Webzoka Jastip',
   tagline: 'Jastip Profesional dari Jepang ke Indonesia',
   waNumber: '6281296917963',
   originCountry: 'Jepang',

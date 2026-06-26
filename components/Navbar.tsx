@@ -11,7 +11,7 @@ const NAV_LINKS = [
 ]
 
 const WA_NUMBER = process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'
-const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo JapanArena Jastip, saya ingin tanya soal jastip dari Jepang 🇯🇵')}`
+const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo Webzoka Jastip, saya ingin tanya soal jastip dari Jepang 🇯🇵')}`
 
 export default function Navbar() {
   const [open, setOpen]       = useState(false)
@@ -38,7 +38,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <a href="#" className={`font-black text-xl tracking-tight ${isDark ? 'text-white' : 'text-gray-900'}`}>
-          JapanArena <span className="text-red-500">Jastip</span>
+          Webzoka <span className="text-red-500">Jastip</span>
         </a>
 
         {/* Desktop nav */}

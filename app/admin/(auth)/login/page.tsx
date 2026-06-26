@@ -171,7 +171,7 @@ export default function LoginPage() {
           <img src="/logo-rocket.png" alt="Logo Webzoka" className="h-16 w-16 object-contain" />
           <div className="text-center mt-2">
             <h1 className="text-2xl font-extrabold tracking-tight" style={{ color: '#f0f4ff' }}>
-              JapanArena
+              Webzoka
             </h1>
             <p
               className="text-[11px] font-bold tracking-[0.2em] uppercase mt-1"
@@ -219,7 +219,7 @@ export default function LoginPage() {
         <div className="flex items-center justify-center gap-3 mt-6">
           <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.05)' }} />
           <p className="text-[10px] font-semibold" style={{ color: 'rgba(120,140,180,0.35)' }}>
-            JapanArena Jastip · v1.0.0
+            Webzoka Jastip · v1.0.0
           </p>
           <div className="h-px flex-1" style={{ background: 'rgba(255,255,255,0.05)' }} />
         </div>

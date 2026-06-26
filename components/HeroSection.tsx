@@ -1,7 +1,7 @@
 import { ArrowDown, MessageCircle, Check } from 'lucide-react'
 
 const WA_NUMBER  = process.env.NEXT_PUBLIC_WA_NUMBER  ?? '6281296917963'
-const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo JapanArena Jastip, saya ingin tanya soal jastip dari Jepang 🇯🇵')}`
+const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo Webzoka Jastip, saya ingin tanya soal jastip dari Jepang 🇯🇵')}`
 
 export default function HeroSection() {
   return (

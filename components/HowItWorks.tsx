@@ -12,7 +12,7 @@ const STEPS = [
   {
     icon: '💬',
     title: 'Konfirmasi via WA',
-    desc: 'Chat dengan tim JapanArena untuk konfirmasi order, lakukan pembayaran, dan dapatkan update tracking realtime.',
+    desc: 'Chat dengan tim Webzoka untuk konfirmasi order, lakukan pembayaran, dan dapatkan update tracking realtime.',
   },
   {
     icon: '📦',

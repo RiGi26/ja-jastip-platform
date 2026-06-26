@@ -53,7 +53,7 @@ export default function CategorySection() {
         <p className="text-center text-gray-400 text-sm mt-8">
           Kategori lain atau barang spesial?{' '}
           <a
-            href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'}?text=${encodeURIComponent('Halo JapanArena Jastip, saya ingin tanya soal barang spesial 🇯🇵')}`}
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_WA_NUMBER ?? '6281296917963'}?text=${encodeURIComponent('Halo Webzoka Jastip, saya ingin tanya soal barang spesial 🇯🇵')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-600 hover:text-blue-700 font-bold"

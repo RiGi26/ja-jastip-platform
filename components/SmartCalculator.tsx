@@ -94,7 +94,7 @@ export default function SmartCalculator() {
 
   const result = calculate(input)
 
-  const orderMsg = `Halo Japan Arena Corp! 🇯🇵\n\nSaya ingin order jastip dengan estimasi:\n\n📦 *DETAIL BARANG*\n- Kategori: ${category.label}\n- Berat: ${weight}kg\n- Dimensi: ${length}x${width}x${height} cm\n- Pengiriman: ${service.label}\n\n💰 *ESTIMASI TOTAL*\n*${formatRupiah(result.total)}*\n\n_(Sudah termasuk Pajak & Bea Cukai)_\n\nMohon info slot pengiriman terdekat ya!`
+  const orderMsg = `Halo Webzoka Jastip! 🇯🇵\n\nSaya ingin order jastip dengan estimasi:\n\n📦 *DETAIL BARANG*\n- Kategori: ${category.label}\n- Berat: ${weight}kg\n- Dimensi: ${length}x${width}x${height} cm\n- Pengiriman: ${service.label}\n\n💰 *ESTIMASI TOTAL*\n*${formatRupiah(result.total)}*\n\n_(Sudah termasuk Pajak & Bea Cukai)_\n\nMohon info slot pengiriman terdekat ya!`
   const orderUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(orderMsg)}`
 
   return (

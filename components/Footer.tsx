@@ -3,7 +3,7 @@ import BackToCorpBanner from './BackToCorpBanner'
 const WA_NUMBER   = process.env.NEXT_PUBLIC_WA_NUMBER   ?? '6281296917963'
 const LANDING_URL = process.env.NEXT_PUBLIC_LANDING_URL ?? 'https://ja-landingpage-platform.vercel.app'
 
-const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo JapanArena Jastip, saya ingin tanya soal jastip dari Jepang 🇯🇵')}`
+const waUrl = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Halo Webzoka Jastip, saya ingin tanya soal jastip dari Jepang 🇯🇵')}`
 
 export default function Footer() {
   return (
@@ -16,7 +16,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <p className="font-black text-white text-base mb-2">
-              JapanArena <span className="text-red-500">Jastip</span>
+              Webzoka <span className="text-red-500">Jastip</span>
             </p>
             <p className="text-sm leading-relaxed max-w-xs">
               Sistem jastip profesional dari Jepang ke Indonesia. Express 5–9 hari, success rate 99.4%.
@@ -59,7 +59,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
-          <p>© 2026 JapanArena Jastip. Bagian dari Japan Arena Corp.</p>
+          <p>© 2026 Webzoka. Bagian dari Japan Arena Corp.</p>
           <p>Jepang → Indonesia, langsung ke tanganmu 🇯🇵</p>
         </div>
       </div>

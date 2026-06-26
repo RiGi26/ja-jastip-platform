@@ -23,7 +23,7 @@ export default function FeaturesSection() {
         <div className="text-center mb-14">
           <p className="text-xs font-black uppercase tracking-widest text-blue-600 mb-3">Keunggulan</p>
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4">
-            Kenapa Pilih JapanArena Jastip?
+            Kenapa Pilih Webzoka Jastip?
           </h2>
           <p className="text-gray-400 text-lg max-w-xl mx-auto">
             Tiga alasan utama mengapa ratusan customer mempercayakan jastip mereka ke kami.
